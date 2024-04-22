@@ -13,5 +13,5 @@ public class UpdateCommentDto {
     private Integer id;
 
     @NotBlank(message = "COMMENT_CONTENT_MISSING")
-    private String newContent;
+    private String content;
 }

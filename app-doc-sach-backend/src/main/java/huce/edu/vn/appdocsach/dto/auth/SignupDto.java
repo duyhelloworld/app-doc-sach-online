@@ -1,8 +1,8 @@
 package huce.edu.vn.appdocsach.dto.auth;
 
-import huce.edu.vn.appdocsach.constants.AppConst;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import huce.edu.vn.appdocsach.annotations.valid.ValidEmail;
+import huce.edu.vn.appdocsach.annotations.valid.ValidPassword;
+import huce.edu.vn.appdocsach.annotations.valid.ValidUsername;
 import lombok.Data;
 
 @Data
@@ -10,15 +10,12 @@ public class SignupDto {
 
     private String fullName;
     
-    @NotBlank(message = "USERNAME_MISSING")
-    @Pattern(regexp = AppConst.REGEX_CHECK_USERNAME, message = "USERNAME_INVALID")
+    @ValidUsername
     private String username;
 
-    @NotBlank(message = "EMAIL_MISSING")
-    @Pattern(regexp = AppConst.REGEX_CHECK_EMAIL, message = "EMAIL_INVALID")
+    @ValidEmail
     private String email;
 
-    @NotBlank(message = "PASSWORD_MISSING")
-    @Pattern(regexp = AppConst.REGEX_CHECK_PASSWORD, message = "PASSWORD_INVALID")
+    @ValidPassword
     private String password;
 }

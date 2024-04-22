@@ -22,6 +22,7 @@ import huce.edu.vn.appdocsach.services.auth.users.AuthUser;
 import huce.edu.vn.appdocsach.services.core.BookService;
 import huce.edu.vn.appdocsach.services.core.RateService;
 import huce.edu.vn.appdocsach.utils.Mapper;
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -67,7 +68,7 @@ public class BookController {
     @PutMapping("rate")
     public void rateBook(@AuthenticationPrincipal AuthUser authUser, 
         @RequestParam Integer bookId,
-        @RequestBody CreateRateDto createRateDto) {
+        @RequestBody @Valid CreateRateDto createRateDto) {
             rateService.toggerRate(authUser.getUser(), createRateDto, bookId);
     }
 }

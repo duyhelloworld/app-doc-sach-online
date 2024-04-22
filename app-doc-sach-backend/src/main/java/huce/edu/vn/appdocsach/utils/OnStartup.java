@@ -16,6 +16,7 @@ import huce.edu.vn.appdocsach.entities.Category;
 import huce.edu.vn.appdocsach.entities.Role;
 import huce.edu.vn.appdocsach.entities.TokenProvider;
 import huce.edu.vn.appdocsach.entities.User;
+import huce.edu.vn.appdocsach.paging.PagingHelper;
 import huce.edu.vn.appdocsach.repositories.CategoryRepo;
 import huce.edu.vn.appdocsach.repositories.UserRepo;
 import huce.edu.vn.appdocsach.services.auth.JwtService;
@@ -51,7 +52,8 @@ public class OnStartup implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
+        
+        PagingHelper.init();
         // init example category
         if (categoryRepo.count() == 0) {
 

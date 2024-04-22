@@ -17,5 +17,7 @@ public class SimpleBookDto {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastUpdatedAt;
 
+    private String author;
+
     private String coverImage;
 }

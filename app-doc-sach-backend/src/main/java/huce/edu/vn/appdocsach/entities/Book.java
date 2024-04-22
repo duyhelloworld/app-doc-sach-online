@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -48,15 +50,18 @@ public class Book {
     @Column(columnDefinition = "text")
     private String description;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(name = "books_categories", 
         joinColumns = @JoinColumn(name = "book_id"), 
         inverseJoinColumns = @JoinColumn(name = "category_id"))
     private List<Category> categories = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "book")
     private List<Chapter> chapters = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "book")
     private List<Rating> ratings = new ArrayList<>();
 }

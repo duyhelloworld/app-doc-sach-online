@@ -1,5 +1,7 @@
 package huce.edu.vn.appdocsach.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,10 +25,12 @@ public class Rating {
     @Column(nullable = false)
     private Short star;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(nullable = false)
     private User user;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(nullable = false)
     private Book book;

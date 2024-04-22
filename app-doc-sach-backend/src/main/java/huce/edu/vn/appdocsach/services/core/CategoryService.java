@@ -29,18 +29,22 @@ public class CategoryService {
         return categoryRepo.findAll().stream().map(c -> convertSimple(c)).toList();
     }
 
+    public boolean isEmpty() {
+        return categoryRepo.count() == 0;
+    }
+
     @Transactional
     public CategoryDto getCategoryById(Integer id) {
         logger.onStart(Thread.currentThread(), id);
         return convert(categoryRepo.findById(id)
-                .orElseThrow(() -> new AppException(ResponseCode.CategoryNotFound)));
+                .orElseThrow(() -> new AppException(ResponseCode.CATEGORY_NOT_FOUND)));
     }
 
     @Transactional
     public Integer createNew(CreateCategoryDto createCategoryDto) {
         logger.onStart(Thread.currentThread());
         if (categoryRepo.existsByName(createCategoryDto.getName())) {
-            throw new AppException(ResponseCode.CategoryNameExisted);
+            throw new AppException(ResponseCode.CATEGORY_NAME_EXISTED);
         }
         Category category = new Category();
         category.setName(createCategoryDto.getName());

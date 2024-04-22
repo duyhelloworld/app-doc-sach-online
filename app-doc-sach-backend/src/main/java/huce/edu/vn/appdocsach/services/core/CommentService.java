@@ -19,7 +19,7 @@ import huce.edu.vn.appdocsach.paging.PagingResponse;
 import huce.edu.vn.appdocsach.repositories.ChapterRepo;
 import huce.edu.vn.appdocsach.repositories.CommentRepo;
 import huce.edu.vn.appdocsach.utils.AppLogger;
-import huce.edu.vn.appdocsach.utils.PagingHelper;
+import huce.edu.vn.appdocsach.paging.PagingHelper;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -37,7 +37,7 @@ public class CommentService {
     public PagingResponse<CommentDto> getCommentsByChapter(FindCommentDto findCommentDto) {
         logger.onStart(Thread.currentThread(), findCommentDto);
         Page<Comment> comments = commentRepo.findByChapterId(findCommentDto.chapterId,
-                PagingHelper.pageRequest(findCommentDto));
+                PagingHelper.pageRequest(Comment.class, findCommentDto));
         PagingResponse<CommentDto> response = new PagingResponse<>();
         response.setTotalPage(comments.getTotalPages());
         response.setValues(comments.map(c -> convert(c)).getContent());
@@ -52,7 +52,7 @@ public class CommentService {
     public CommentDto getCommentById(Integer id) {
         logger.onStart(Thread.currentThread(), id);
         return commentRepo.findById(id).map(c -> convert(c)).orElseThrow(
-                () -> new AppException(ResponseCode.CommentNotFound));
+                () -> new AppException(ResponseCode.COMMENT_NOT_FOUND));
     }
 
     @Transactional
@@ -60,7 +60,7 @@ public class CommentService {
         logger.onStart(Thread.currentThread(), user.getUsername(), createCommentDto);
         int chapterId = createCommentDto.getChapterId();
         Chapter chapter = chapterRepo.findById(chapterId)
-                .orElseThrow(() -> new AppException(ResponseCode.ChapterNotFound));
+                .orElseThrow(() -> new AppException(ResponseCode.CHAPTER_NOT_FOUND));
         Comment comment = new Comment();
         comment.setUser(user);
         comment.setContent(createCommentDto.getContent());
@@ -71,20 +71,28 @@ public class CommentService {
     }
 
     public CommentDto updateComment(User user, UpdateCommentDto updateCommentDto) {
+        logger.onStart(Thread.currentThread(), updateCommentDto, user.getUsername());
         Comment comment = commentRepo.findById(updateCommentDto.getId())
-                .orElseThrow(() -> new AppException(ResponseCode.CommentNotFound));
+                .orElseThrow(() -> new AppException(ResponseCode.COMMENT_NOT_FOUND));
                 logger.info(user);
                 logger.info(comment.getUser());
         if (!comment.getUser().equals(user)) {
-            throw new AppException(ResponseCode.DontHaveEditCommentPermission);
+            throw new AppException(ResponseCode.DONT_HAVE_EDIT_COMMENT_PERMISSION);
         }
-        comment.setContent(updateCommentDto.getNewContent());
+        comment.setContent(updateCommentDto.getContent());
         comment.setEditedAt(LocalDateTime.now());
         return convert(commentRepo.save(comment));
     }
 
-    public void removeComment() {
-        
+    @Transactional
+    public void removeComment(Integer id, User user) {
+        logger.onStart(Thread.currentThread(), id, user.getUsername());
+        Comment comment = commentRepo.findById(id)
+                .orElseThrow(() -> new AppException(ResponseCode.COMMENT_NOT_FOUND));
+        if (!comment.getUser().equals(user)) {
+            throw new AppException(ResponseCode.DONT_HAVE_REMOVE_COMMENT_PERMISSION);
+        }  
+        commentRepo.delete(comment);
     }
 
     private CommentDto convert(Comment comment) {

@@ -132,7 +132,7 @@ public class CloudinaryService {
             return save(file.getBytes(), file.getOriginalFilename());
         } catch (IOException e) {
             logger.error(e);
-            throw new AppException(ResponseCode.FileContentInvalid);
+            throw new AppException(ResponseCode.FILE_CONTENT_INVALID);
         }
     }
 

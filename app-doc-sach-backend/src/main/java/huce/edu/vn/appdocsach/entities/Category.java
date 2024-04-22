@@ -4,6 +4,8 @@ package huce.edu.vn.appdocsach.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,6 +31,7 @@ public class Category {
     @Column(columnDefinition = "text")
     private String description;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "categories")
     private List<Book> books = new ArrayList<>();
 }

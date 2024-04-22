@@ -22,7 +22,7 @@ public class Mapper {
             return objectMapper.readValue(json, input);
         } catch (JsonProcessingException e) {
             logger.error(e.getLocation().toString());
-            throw new AppException(ResponseCode.UnexpectedError);
+            throw new AppException(ResponseCode.UNEXPECTED_ERROR);
         }
     }
 }

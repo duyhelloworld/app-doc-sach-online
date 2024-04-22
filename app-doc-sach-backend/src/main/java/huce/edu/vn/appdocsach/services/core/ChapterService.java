@@ -23,7 +23,7 @@ import huce.edu.vn.appdocsach.repositories.ChapterRepo;
 import huce.edu.vn.appdocsach.services.file.CloudinaryService;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 import huce.edu.vn.appdocsach.utils.NamingUtil;
-import huce.edu.vn.appdocsach.utils.PagingHelper;
+import huce.edu.vn.appdocsach.paging.PagingHelper;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -44,19 +44,18 @@ public class ChapterService {
     public ChapterDto getChapter(Integer id) {
         logger.onStart(Thread.currentThread(), id);
         Chapter chapter = chapterRepo.findById(id)
-                .orElseThrow(() -> new AppException(ResponseCode.ChapterNotFound));
+                .orElseThrow(() -> new AppException(ResponseCode.CHAPTER_NOT_FOUND));
         return convert(chapter, chapter.getBook());
     }
 
     public boolean isEmpty() {
-        logger.onStart(Thread.currentThread());
         return chapterRepo.count() == 0;
     }
 
     @Transactional
     public PagingResponse<SimpleChapterDto> getAllChapterSimple(FindChapterDto findChapterDto) {
         logger.onStart(Thread.currentThread(), findChapterDto);
-        PageRequest pageRequest = PagingHelper.pageRequest(findChapterDto);
+        PageRequest pageRequest = PagingHelper.pageRequest(Chapter.class, findChapterDto);
         Page<Chapter> chapters = chapterRepo.findByBookId(findChapterDto.getBookId(), pageRequest);
         PagingResponse<SimpleChapterDto> response = new PagingResponse<>();
         response.setTotalPage(chapters.getTotalPages());
@@ -67,13 +66,13 @@ public class ChapterService {
     @Transactional
     public Integer create(List<MultipartFile> files, CreateChapterDto createChapterDto) {
         Book book = bookRepo.findById(createChapterDto.getBookId())
-                .orElseThrow(() -> new AppException(ResponseCode.BookNotFound));
+                .orElseThrow(() -> new AppException(ResponseCode.BOOK_NOT_FOUND));
         if (chapterRepo.existsByTitle(createChapterDto.getTitle())) {
-            throw new AppException(ResponseCode.ChapterTitleExisted);
+            throw new AppException(ResponseCode.CHAPTER_TITLE_EXISTED);
         }
         String folderName = NamingUtil.normalizeFolderName(createChapterDto);
         if (chapterRepo.existsByFolderName(folderName)) {
-            throw new AppException(ResponseCode.ChapterTitleCannotEncode);
+            throw new AppException(ResponseCode.CHAPTER_TITLE_INVALID);
         }
         cloudinaryService.save(files, folderName);
         

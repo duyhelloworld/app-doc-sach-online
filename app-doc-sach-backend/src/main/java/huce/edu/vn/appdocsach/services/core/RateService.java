@@ -31,7 +31,7 @@ public class RateService {
     public void toggerRate(User user, CreateRateDto createRateDto, Integer bookId) {
         logger.onStart(Thread.currentThread(), user.getUsername(), createRateDto);
         Book book = bookRepo.findById(bookId).orElseThrow(
-                () -> new AppException(ResponseCode.BookNotFound));
+                () -> new AppException(ResponseCode.BOOK_NOT_FOUND));
         Optional<Rating> ratingOptional = ratingRepo.findByUserAndBook(user, book);
         if (ratingOptional.isEmpty()) {
             Rating rating = new Rating();

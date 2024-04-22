@@ -61,12 +61,12 @@ public class AuthUserService extends DefaultOAuth2UserService implements UserDet
         logger.onStart(Thread.currentThread(), signinDto);
         User user = loadUser(signinDto.getUsername());
         if (user == null) {
-            throw new AppException(ResponseCode.Unauthorized);
+            throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
         }
         if (passwordEncoder.matches(signinDto.getPassword(), user.getPassword())) {
             return getResponse(user);
         }
-        throw new AppException(ResponseCode.UsernameOrPasswordIncorrect);
+        throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
     }
 
     @Transactional
@@ -78,13 +78,13 @@ public class AuthUserService extends DefaultOAuth2UserService implements UserDet
             logger.onStart(Thread.currentThread(), username, "Avatar = ", AppConst.DEFAULT_AVATAR_FILENAME_WITH_EXTENSION);
         } else {
             if (!cloudinaryService.isValidFileName(avatar)) {
-                throw new AppException(ResponseCode.FileNameInvalid);
+                throw new AppException(ResponseCode.FILE_TYPE_INVALID);
             }
             logger.onStart(Thread.currentThread(), username, "Avatar = ", avatar.getOriginalFilename());
             avatarUrl = cloudinaryService.save(avatar);
         }
         if (userRepo.existsByUsername(username)) {
-            throw new AppException(ResponseCode.UsernameExisted);
+            throw new AppException(ResponseCode.USERNAME_EXISTED);
         }
         User user = new User();
         user.setUsername(username);
@@ -104,7 +104,7 @@ public class AuthUserService extends DefaultOAuth2UserService implements UserDet
         logger.onStart(Thread.currentThread(), username);
         User user = loadUser(username);
         if (user == null) {
-            throw new AppException(ResponseCode.Unauthorized);
+            throw new AppException(ResponseCode.UNAUTHORIZED);
         }
         return LocalUser.getInstance(user);
     }
@@ -148,7 +148,7 @@ public class AuthUserService extends DefaultOAuth2UserService implements UserDet
             user.setProvider(authUser.getProvider());
             return userRepo.save(user);
         } catch (Exception e) {
-            throw new AppException(ResponseCode.Unauthorized);
+            throw new AppException(ResponseCode.UNAUTHORIZED);
         }
     }
 

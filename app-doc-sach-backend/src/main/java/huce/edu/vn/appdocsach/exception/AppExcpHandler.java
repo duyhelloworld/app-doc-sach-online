@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,43 +20,48 @@ public class AppExcpHandler {
 
     @ExceptionHandler({ Exception.class })
     ResponseEntity<ErrorResponse> handleAppException(Exception ex) {
-        // CustomException đã định nghĩa
-        ErrorResponse response = new ErrorResponse();
-        logger.error(ex);
+        
+        logger.error(ex.getLocalizedMessage());
 
+        // Custom Exception đã định nghĩa --> Không cần thiết in log lắm
         if (ex instanceof AppException appEx) {
-            ResponseCode responseCode = appEx.getResponseCode();
-            response.setCode(responseCode.getCode());
-            response.setMessages(responseCode.getMessage());
-            return ResponseEntity.status(responseCode.getStatusCode()).body(response);
+            return writeResponse(appEx.getResponseCode());
+        }
+        
+        // Security
+        if (ex instanceof AccessDeniedException) {
+            return writeResponse(ResponseCode.FORBIDDEN);
         }
 
         // @Valid
         if (ex instanceof MethodArgumentNotValidException invalidException) {
             try {
+                ErrorResponse response = new ErrorResponse();
                 response.setMessages(invalidException.getBindingResult().getAllErrors()
                     .stream()
                     .map(e -> ResponseCode.valueOf(e.getDefaultMessage()).getMessage())
                     .toList());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             } catch (IllegalArgumentException e) {
-                ResponseCode invalidKey = ResponseCode.InvalidKey;
-                response.setCode(invalidKey.getCode());
-                response.setMessages(invalidKey.getMessage());
-                return ResponseEntity.status(invalidKey.getStatusCode()).body(response);
+                return writeResponse(ResponseCode.INVALID_KEY);
             }
         }
 
         // Url invalid
         if (ex instanceof FileNotFoundException || ex instanceof NoResourceFoundException) {
+            ErrorResponse response = new ErrorResponse();
             response.setMessages(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(response);
         }
-        
-        ResponseCode unexpected = ResponseCode.UnexpectedError;
-        response.setCode(unexpected.getCode());
-        response.setMessages(unexpected.getMessage());
-        return ResponseEntity.status(unexpected.getStatusCode()).body(response);
+
+        return writeResponse(ResponseCode.UNEXPECTED_ERROR);
+    }
+
+    private ResponseEntity<ErrorResponse> writeResponse(ResponseCode responseCode) {
+        ErrorResponse response = new ErrorResponse();
+        response.setCode(responseCode.getCode());
+        response.setMessages(responseCode.getMessage());
+        return ResponseEntity.status(responseCode.getStatusCode()).body(response);
     }
 }

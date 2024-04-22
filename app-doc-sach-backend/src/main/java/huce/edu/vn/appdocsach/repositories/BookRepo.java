@@ -15,6 +15,9 @@ public interface BookRepo extends JpaRepository<Book, Integer> {
 
     boolean existsByTitle(String title);
 
+    @Query("SELECT b FROM Book b WHERE CONCAT(b.title, ' ', b.author, ' ') LIKE %?1%")
+    Page<Book> search(String keyword, Pageable pageable);
+
     @Query("SELECT b FROM Book b JOIN b.categories c WHERE c.id = :categoryId")
     Page<Book> findByCategoryId(@Param("categoryId") Integer categoryId, Pageable pageable);
 }
