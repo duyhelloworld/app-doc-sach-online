@@ -59,6 +59,12 @@ cloudinary:
   secret: Lk1CRVD-DmLiCDdyNVQUNwqsmgA
 
 springdoc:
+  show-oauth2-endpoints: true
+  pre-loading-enabled: true
   swagger-ui:
     path: /
-    operations-sorter: method
+    try-it-out-enabled: false
+    operations-sorter: alpha
+    syntax-highlight:
+      activated: true
+      theme: nord

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -22,6 +23,7 @@ import huce.edu.vn.appdocsach.services.auth.users.AuthUser;
 import huce.edu.vn.appdocsach.services.core.BookService;
 import huce.edu.vn.appdocsach.services.core.RateService;
 import huce.edu.vn.appdocsach.utils.Mapper;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,22 +42,26 @@ public class BookController {
     @Autowired
     private RateService rateService;
 
+    @Operation(summary = "Lấy tất cả sách cho trang home + Tìm kiếm theo thể loại & từ khóa")
     @GetMapping("all")
     public PagingResponse<SimpleBookDto> getAllBook(FindBookDto findBookDto) {
         return bookService.getAllBookSimple(findBookDto);
     }
 
-    @GetMapping("find")
-    public BookDto getBookById(@RequestParam Integer id) {
+    @Operation(summary = "Lấy sách theo id, dùng cho trang hiển thị thông tin tin cụ thể của sách")
+    @GetMapping("find/{id}")
+    public BookDto getBookById(@PathVariable Integer id) {
         return bookService.getBookById(id);
     }
 
+    @Operation(summary = "Thêm mới 1 sách với ảnh bìa mặc định")
     @IsAdmin
     @PostMapping("without-cover")
     public Integer addNew(@AuthenticationPrincipal AuthUser authUser, @RequestBody CreateBookDto createBookDto) {
         return bookService.addBook(createBookDto, null);
     }
 
+    @Operation(summary = "Thêm mới 1 sách với ảnh bìa cung cấp")
     @IsAdmin
     @PostMapping(path = "with-cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Integer addNewWithImage(@AuthenticationPrincipal AuthUser authUser,
@@ -64,6 +70,7 @@ public class BookController {
         return bookService.addBook(mapper.getInstance(jsonCreateBookDto, CreateBookDto.class), coverImage);
     }
 
+    @Operation(summary = "Nhấn đánh giá 1 sách. Gọi lần nữa để hủy")
     @IsUser
     @PutMapping("rate")
     public void rateBook(@AuthenticationPrincipal AuthUser authUser, 

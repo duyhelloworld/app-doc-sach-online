@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import huce.edu.vn.appdocsach.constants.AppConst;
 import huce.edu.vn.appdocsach.utils.AppLogger;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("api/image")
@@ -19,6 +20,7 @@ public class ImageController {
 
     private AppLogger<ImageController> logger = new AppLogger<>(ImageController.class);
 
+    @Operation(summary = "Lấy ảnh avatar mặc định")
     @GetMapping(AppConst.DEFAULT_AVATAR_FILENAME_WITH_EXTENSION)
     public ResponseEntity<Resource> getDefaultAvatar() {
         logger.onStart(Thread.currentThread());
@@ -28,6 +30,7 @@ public class ImageController {
             .body(new FileSystemResource(Path.of(AppConst.DEFAULT_AVATAR_PATH)));
     }
 
+    @Operation(summary = "Lấy ảnh bìa sách mặc định")
     @GetMapping(AppConst.DEFAULT_COVER_IMAGE_FILENAME_WITH_EXTENSION)
     public ResponseEntity<Resource> getDefaultCoverImage() {
         logger.onStart(Thread.currentThread());

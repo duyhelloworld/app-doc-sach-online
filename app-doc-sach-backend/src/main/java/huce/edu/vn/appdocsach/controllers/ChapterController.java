@@ -20,6 +20,8 @@ import huce.edu.vn.appdocsach.dto.core.chapter.SimpleChapterDto;
 import huce.edu.vn.appdocsach.paging.PagingResponse;
 import huce.edu.vn.appdocsach.services.core.ChapterService;
 import huce.edu.vn.appdocsach.utils.Mapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -33,20 +35,24 @@ public class ChapterController {
     @Autowired
     private Mapper mapper;
 
+    @Operation(summary = "Lấy thông tin các chapter gần đây")
     @GetMapping
     public PagingResponse<SimpleChapterDto> getChapterSimple(FindChapterDto findChapterDto) {
         return chapterService.getAllChapterSimple(findChapterDto);
     }
     
-    @GetMapping("find")
+    @Operation(summary = "Đọc chapter")
+    @GetMapping("find/{id}")
     public ChapterDto getChapter(@PathVariable Integer id) {
         return chapterService.getChapter(id);
     }
 
+    @Operation(summary = "Upload 1 chapter cho 1 sách")
     @IsAdmin
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Integer addNewChapter(
         @RequestPart List<MultipartFile> files,
+        @Parameter(description = "{ \"title\": \"A\", \"bookId\": 1 }")
         @RequestPart String jsonDto) {
         return chapterService.create(files, mapper.getInstance(jsonDto, CreateChapterDto.class));
     }
