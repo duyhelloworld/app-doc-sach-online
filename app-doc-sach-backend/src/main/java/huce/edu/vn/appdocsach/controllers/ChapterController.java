@@ -52,7 +52,7 @@ public class ChapterController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Integer addNewChapter(
         @RequestPart List<MultipartFile> files,
-        @Parameter(description = "{ \"title\": \"A\", \"bookId\": 1 }")
+        @Parameter(description = "{ \"title\": \"A\" , \"bookId\": 1 }")
         @RequestPart String jsonDto) {
         return chapterService.create(files, mapper.getInstance(jsonDto, CreateChapterDto.class));
     }
