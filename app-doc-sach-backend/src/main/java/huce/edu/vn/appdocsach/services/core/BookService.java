@@ -3,7 +3,6 @@ package huce.edu.vn.appdocsach.services.core;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,6 +42,9 @@ public class BookService {
     private CategoryService categoryService;
 
     @Autowired
+    private ChapterService chapterService;
+
+    @Autowired
     private CloudinaryService cloudinaryService;
 
     private AppLogger<BookService> logger = new AppLogger<>(BookService.class);
@@ -51,14 +53,13 @@ public class BookService {
     public PagingResponse<SimpleBookDto> getAllBookSimple(FindBookDto findBookDto) {
         logger.onStart(Thread.currentThread(), findBookDto);
         Pageable pageRequest = PagingHelper.pageRequest(Book.class, findBookDto);
-        // Pageable pageRequest = Pageable.unpaged();
         Page<Book> books;
         Integer cid = findBookDto.getCategoryId();
         String keyword = findBookDto.getKeyword();
-        if (cid != 0) {
-            books = bookRepo.findByCategoryId(findBookDto.getCategoryId(), pageRequest);
-        } else if (StringUtils.hasText(keyword)) {
+        if (StringUtils.hasText(keyword)) {
             books = bookRepo.search(keyword, pageRequest);
+        } else if (cid != 0) {
+            books = bookRepo.findByCategoryId(findBookDto.getCategoryId(), pageRequest);
         } else {
             books = bookRepo.findAll(pageRequest);
         }
@@ -82,7 +83,8 @@ public class BookService {
     @Transactional
     public Integer addBook(CreateBookDto createBookDto, MultipartFile coverImage) {
         try {
-            return coverImage != null ? addBook(createBookDto, coverImage.getBytes(), coverImage.getOriginalFilename()) 
+            return coverImage != null 
+                ? addBook(createBookDto, coverImage.getBytes(), coverImage.getOriginalFilename()) 
                 : addBook(createBookDto, null, null);
         } catch (IOException e) {
             logger.error(e);
@@ -133,9 +135,8 @@ public class BookService {
             .coverImage(book.getCoverImage())
             .description(book.getDescription())
             .lastUpdatedAt(book.getUpdatedAt() == null ? book.getCreatedAt() : book.getUpdatedAt())
-            .categories(book.getCategories().stream()
-                .map(category -> categoryService.convertSimple(category))
-                .collect(Collectors.toList()))
+            .categories(book.getCategories().stream().map(c -> categoryService.convertSimple(c)).toList())
+            .chapters(book.getChapters().stream().map(ch -> chapterService.convert(ch)).toList())
             .averageRate(book.getRatings().stream()
                         .mapToDouble(Rating::getStar)
                         .average()

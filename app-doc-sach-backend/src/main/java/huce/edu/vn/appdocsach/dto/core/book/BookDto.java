@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import huce.edu.vn.appdocsach.dto.core.category.SimpleCategoryDto;
+import huce.edu.vn.appdocsach.dto.core.chapter.SimpleChapterDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -28,4 +29,6 @@ public class BookDto {
     private Double averageRate;
 
     private List<SimpleCategoryDto> categories;
+
+    private List<SimpleChapterDto> chapters;
 }
