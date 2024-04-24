@@ -3,7 +3,6 @@ package huce.edu.vn.appdocsach.utils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -19,7 +18,6 @@ import huce.edu.vn.appdocsach.entities.User;
 import huce.edu.vn.appdocsach.paging.PagingHelper;
 import huce.edu.vn.appdocsach.repositories.CategoryRepo;
 import huce.edu.vn.appdocsach.repositories.UserRepo;
-import huce.edu.vn.appdocsach.services.auth.JwtService;
 import huce.edu.vn.appdocsach.services.core.BookService;
 import huce.edu.vn.appdocsach.services.core.ChapterService;
 import huce.edu.vn.appdocsach.services.core.CommentService;
@@ -44,9 +42,6 @@ public class OnStartup implements CommandLineRunner {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtService jwtService;
 
     private AppLogger<OnStartup> logger = new AppLogger<>(OnStartup.class);
 
@@ -145,14 +140,6 @@ public class OnStartup implements CommandLineRunner {
             userRepo.saveAll(List.of(u1, u2, u3));
             logger.info("Saved user account : {}, {}", u2.getUsername(), u3.getUsername());
             logger.info("Saved admin account : {}", u1.getUsername());
-        }
-
-        // Build pre-token for admin account
-        Optional<User> adminAccount = userRepo.findByUsername("admin");
-        if (adminAccount.isEmpty()) {
-            logger.error("Not found admin account");
-        } else {
-            logger.info("Admin account token : {}", jwtService.buildToken(adminAccount.get()));
         }
     }
 }

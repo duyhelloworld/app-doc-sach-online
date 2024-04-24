@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import huce.edu.vn.appdocsach.annotations.auth.IsAdmin;
-import huce.edu.vn.appdocsach.dto.core.chapter.ChapterDto;
 import huce.edu.vn.appdocsach.dto.core.chapter.CreateChapterDto;
 import huce.edu.vn.appdocsach.dto.core.chapter.FindChapterDto;
 import huce.edu.vn.appdocsach.dto.core.chapter.SimpleChapterDto;
@@ -43,7 +42,7 @@ public class ChapterController {
     
     @Operation(summary = "Đọc chapter")
     @GetMapping("find/{id}")
-    public ChapterDto getChapter(@PathVariable Integer id) {
+    public List<String> getChapter(@PathVariable Integer id) {
         return chapterService.getChapter(id);
     }
 

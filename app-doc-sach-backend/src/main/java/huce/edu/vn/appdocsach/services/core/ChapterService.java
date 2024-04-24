@@ -9,7 +9,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import huce.edu.vn.appdocsach.dto.core.chapter.ChapterDto;
 import huce.edu.vn.appdocsach.dto.core.chapter.CreateChapterDto;
 import huce.edu.vn.appdocsach.dto.core.chapter.FindChapterDto;
 import huce.edu.vn.appdocsach.dto.core.chapter.SimpleChapterDto;
@@ -41,11 +40,11 @@ public class ChapterService {
     private AppLogger<ChapterService> logger = new AppLogger<>(ChapterService.class);
 
     @Transactional
-    public ChapterDto getChapter(Integer id) {
+    public List<String> getChapter(Integer id) {
         logger.onStart(Thread.currentThread(), id);
         Chapter chapter = chapterRepo.findById(id)
                 .orElseThrow(() -> new AppException(ResponseCode.CHAPTER_NOT_FOUND));
-        return convert(chapter, chapter.getBook());
+        return cloudinaryService.getUrls(chapter.getFolderName());
     }
 
     public boolean isEmpty() {
@@ -85,16 +84,6 @@ public class ChapterService {
         chapter.setBook(book);
         chapterRepo.save(chapter);
         return chapter.getId();
-    }
-
-    public ChapterDto convert(Chapter chapter, Book book) {
-        return ChapterDto.builder()
-                .id(chapter.getId())
-                .title(chapter.getTitle())
-                .lastUpdatedAt(chapter.getUpdatedAt() == null ? chapter.getCreatedAt() : chapter.getUpdatedAt())
-                .bookId(book.getId())
-                .bookTitle(book.getTitle())
-                .build();
     }
 
     public SimpleChapterDto convert(Chapter chapter) {
