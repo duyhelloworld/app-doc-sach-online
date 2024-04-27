@@ -2,7 +2,6 @@ package huce.edu.vn.appdocsach.services.core;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import huce.edu.vn.appdocsach.dto.core.rate.CreateRateDto;
@@ -15,17 +14,24 @@ import huce.edu.vn.appdocsach.repositories.BookRepo;
 import huce.edu.vn.appdocsach.repositories.RatingRepo;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RateService {
 
-    @Autowired
-    private RatingRepo ratingRepo;
+    RatingRepo ratingRepo;
 
-    @Autowired
-    private BookRepo bookRepo;
+    BookRepo bookRepo;
 
-    private AppLogger<RateService> logger = new AppLogger<>(RateService.class);
+    AppLogger<RateService> logger;
+
+    public RateService(RatingRepo ratingRepo, BookRepo bookRepo) {
+        this.ratingRepo = ratingRepo;
+        this.bookRepo = bookRepo;
+        this.logger = new AppLogger<>(RateService.class);
+    }
 
     @Transactional
     public void toggerRate(User user, CreateRateDto createRateDto, Integer bookId) {

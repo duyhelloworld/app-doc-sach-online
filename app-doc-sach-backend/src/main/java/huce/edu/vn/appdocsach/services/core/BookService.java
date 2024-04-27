@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,26 +27,33 @@ import huce.edu.vn.appdocsach.repositories.CategoryRepo;
 import huce.edu.vn.appdocsach.services.file.CloudinaryService;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BookService {
 
-    @Autowired
-    private BookRepo bookRepo;
+    BookRepo bookRepo;
 
-    @Autowired
-    private CategoryRepo categoryRepo;
+    CategoryRepo categoryRepo;
 
-    @Autowired
-    private CategoryService categoryService;
+    CategoryService categoryService;
 
-    @Autowired
-    private ChapterService chapterService;
+    ChapterService chapterService;
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
+    CloudinaryService cloudinaryService;
 
-    private AppLogger<BookService> logger = new AppLogger<>(BookService.class);
+    AppLogger<BookService> logger ;
+
+    public BookService(BookRepo bookRepo, CategoryRepo categoryRepo, CategoryService categoryService, ChapterService chapterService, CloudinaryService cloudinaryService) {
+        this.bookRepo = bookRepo;
+        this.categoryRepo = categoryRepo;
+        this.categoryService = categoryService;
+        this.chapterService = chapterService;
+        this.cloudinaryService = cloudinaryService;
+        this.logger = new AppLogger<>(BookService.class);
+    }
 
     @Transactional
     public PagingResponse<SimpleBookDto> getAllBookSimple(FindBookDto findBookDto) {

@@ -3,7 +3,6 @@ package huce.edu.vn.appdocsach.services.core;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -24,20 +23,27 @@ import huce.edu.vn.appdocsach.utils.AppLogger;
 import huce.edu.vn.appdocsach.utils.NamingUtil;
 import huce.edu.vn.appdocsach.paging.PagingHelper;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChapterService {
 
-    @Autowired
-    private ChapterRepo chapterRepo;
+    ChapterRepo chapterRepo;
 
-    @Autowired
-    private BookRepo bookRepo;
+    BookRepo bookRepo;
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
+    CloudinaryService cloudinaryService;
 
-    private AppLogger<ChapterService> logger = new AppLogger<>(ChapterService.class);
+    AppLogger<ChapterService> logger ;
+
+    public ChapterService(ChapterRepo chapterRepo, BookRepo bookRepo, CloudinaryService cloudinaryService) {
+        this.chapterRepo = chapterRepo;
+        this.bookRepo = bookRepo;
+        this.cloudinaryService = cloudinaryService;
+        this.logger = new AppLogger<>(ChapterService.class);
+    }
 
     @Transactional
     public List<String> getChapter(Integer id) {

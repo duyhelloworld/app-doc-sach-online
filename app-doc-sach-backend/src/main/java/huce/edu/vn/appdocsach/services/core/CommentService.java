@@ -2,7 +2,6 @@ package huce.edu.vn.appdocsach.services.core;
 
 import java.time.LocalDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -21,22 +20,29 @@ import huce.edu.vn.appdocsach.repositories.CommentRepo;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 import huce.edu.vn.appdocsach.paging.PagingHelper;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CommentService {
 
-    @Autowired
-    private CommentRepo commentRepo;
+    CommentRepo commentRepo;
 
-    @Autowired
-    private ChapterRepo chapterRepo;
+    ChapterRepo chapterRepo;
 
-    private AppLogger<CommentService> logger = new AppLogger<>(CommentService.class);
+    AppLogger<CommentService> logger;
+
+    public CommentService(CommentRepo commentRepo, ChapterRepo chapterRepo) {
+        this.commentRepo = commentRepo;
+        this.chapterRepo = chapterRepo;
+        this.logger = new AppLogger<>(CommentService.class);
+    }
 
     @Transactional
     public PagingResponse<CommentDto> getCommentsByChapter(FindCommentDto findCommentDto) {
         logger.onStart(Thread.currentThread(), findCommentDto);
-        Page<Comment> comments = commentRepo.findByChapterId(findCommentDto.chapterId,
+        Page<Comment> comments = commentRepo.findByChapterId(findCommentDto.getChapterId(),
                 PagingHelper.pageRequest(Comment.class, findCommentDto));
         PagingResponse<CommentDto> response = new PagingResponse<>();
         response.setTotalPage(comments.getTotalPages());

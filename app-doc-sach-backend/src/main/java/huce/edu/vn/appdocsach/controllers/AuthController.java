@@ -1,6 +1,5 @@
 package huce.edu.vn.appdocsach.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,18 +19,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("api/auth")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
     
-    @Autowired
-    private AuthUserService authService;
+    AuthUserService authService;
 
-    @Autowired
-    private Mapper mapper; 
+    Mapper mapper; 
 
     @Operation(summary = "Đăng kí 1 tài khoản với ảnh avatar cung cấp")
     @PostMapping(path = "signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

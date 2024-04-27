@@ -2,7 +2,6 @@ package huce.edu.vn.appdocsach.services.core;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import huce.edu.vn.appdocsach.dto.core.category.CategoryDto;
@@ -14,14 +13,21 @@ import huce.edu.vn.appdocsach.exception.AppException;
 import huce.edu.vn.appdocsach.repositories.CategoryRepo;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CategoryService {
 
-    @Autowired
-    private CategoryRepo categoryRepo;
+    CategoryRepo categoryRepo;
 
-    private AppLogger<CategoryService> logger = new AppLogger<>(CategoryService.class);
+    AppLogger<CategoryService> logger;
+
+    public CategoryService(CategoryRepo categoryRepo) {
+        this.categoryRepo = categoryRepo;
+        this.logger = new AppLogger<>(CategoryService.class);
+    }
 
     @Transactional
     public List<SimpleCategoryDto> getAllSimpleCategory() {

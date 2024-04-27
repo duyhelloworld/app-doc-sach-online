@@ -21,15 +21,19 @@ import huce.edu.vn.appdocsach.services.core.ChapterService;
 import huce.edu.vn.appdocsach.utils.Mapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("api/chapter")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChapterController {
 
-    @Autowired
-    private ChapterService chapterService;
+    ChapterService chapterService;
 
     @Autowired
     private Mapper mapper;

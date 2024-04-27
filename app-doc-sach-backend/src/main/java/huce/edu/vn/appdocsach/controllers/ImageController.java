@@ -13,12 +13,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import huce.edu.vn.appdocsach.constants.AppConst;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 @RestController
 @RequestMapping("api/image")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ImageController {
 
-    private AppLogger<ImageController> logger = new AppLogger<>(ImageController.class);
+    AppLogger<ImageController> logger = new AppLogger<>(ImageController.class);
 
     @Operation(summary = "Lấy ảnh avatar mặc định")
     @GetMapping(AppConst.DEFAULT_AVATAR_FILENAME_WITH_EXTENSION)
