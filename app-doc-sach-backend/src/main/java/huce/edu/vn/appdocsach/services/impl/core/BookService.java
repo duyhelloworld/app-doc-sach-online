@@ -1,4 +1,4 @@
-package huce.edu.vn.appdocsach.services.core;
+package huce.edu.vn.appdocsach.services.impl.core;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -17,44 +17,40 @@ import huce.edu.vn.appdocsach.dto.core.book.FindBookDto;
 import huce.edu.vn.appdocsach.dto.core.book.SimpleBookDto;
 import huce.edu.vn.appdocsach.entities.Book;
 import huce.edu.vn.appdocsach.entities.Category;
-import huce.edu.vn.appdocsach.entities.Rating;
 import huce.edu.vn.appdocsach.enums.ResponseCode;
 import huce.edu.vn.appdocsach.exception.AppException;
 import huce.edu.vn.appdocsach.paging.PagingHelper;
 import huce.edu.vn.appdocsach.paging.PagingResponse;
 import huce.edu.vn.appdocsach.repositories.BookRepo;
 import huce.edu.vn.appdocsach.repositories.CategoryRepo;
-import huce.edu.vn.appdocsach.services.file.CloudinaryService;
+import huce.edu.vn.appdocsach.services.abstracts.core.IBookService;
+import huce.edu.vn.appdocsach.services.abstracts.file.ICloudinaryService;
 import huce.edu.vn.appdocsach.utils.AppLogger;
+import huce.edu.vn.appdocsach.utils.ConvertUtils;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class BookService {
+public class BookService implements IBookService {
 
     BookRepo bookRepo;
 
     CategoryRepo categoryRepo;
 
-    CategoryService categoryService;
-
-    ChapterService chapterService;
-
-    CloudinaryService cloudinaryService;
+    ICloudinaryService cloudinaryService;
 
     AppLogger<BookService> logger ;
 
-    public BookService(BookRepo bookRepo, CategoryRepo categoryRepo, CategoryService categoryService, ChapterService chapterService, CloudinaryService cloudinaryService) {
+    public BookService(BookRepo bookRepo, CategoryRepo categoryRepo, ICloudinaryService cloudinaryService) {
         this.bookRepo = bookRepo;
         this.categoryRepo = categoryRepo;
-        this.categoryService = categoryService;
-        this.chapterService = chapterService;
         this.cloudinaryService = cloudinaryService;
         this.logger = new AppLogger<>(BookService.class);
     }
 
+    @Override
     @Transactional
     public PagingResponse<SimpleBookDto> getAllBookSimple(FindBookDto findBookDto) {
         logger.onStart(Thread.currentThread(), findBookDto);
@@ -70,22 +66,25 @@ public class BookService {
             books = bookRepo.findAll(pageRequest);
         }
         PagingResponse<SimpleBookDto> pagingResponse = new PagingResponse<>();
-        pagingResponse.setValues(books.map(b -> convertSimple(b)).getContent());
+        pagingResponse.setValues(books.map(b -> ConvertUtils.convertSimple(b)).getContent());
         pagingResponse.setTotalPage(books.getTotalPages());
         return pagingResponse;
     }
 
+    @Override
     public boolean isEmpty() {
         return bookRepo.count() == 0;
     }
 
+    @Override
     @Transactional
     public BookDto getBookById(Integer id) {
         logger.onStart(Thread.currentThread(), id);
-        return convert(bookRepo.findById(id)
+        return ConvertUtils.convert(bookRepo.findById(id)
                 .orElseThrow(() -> new AppException(ResponseCode.BOOK_NOT_FOUND)));
     }
 
+    @Override
     @Transactional
     public Integer addBook(CreateBookDto createBookDto, MultipartFile coverImage) {
         try {
@@ -98,6 +97,7 @@ public class BookService {
         }
     }
 
+    @Override
     @Transactional
     public Integer addBook(CreateBookDto createBookDto, byte[] coverImage, String fileName) {
         String coverImageUrl;
@@ -121,32 +121,5 @@ public class BookService {
         book.setCategories(categories);
         bookRepo.save(book);
         return book.getId();
-    }
-
-    public SimpleBookDto convertSimple(Book book) {
-        return SimpleBookDto.builder()
-            .id(book.getId())
-            .coverImage(book.getCoverImage())
-            .title(book.getTitle())
-            .author(book.getAuthor())
-            .lastUpdatedAt(book.getUpdatedAt() == null ? book.getCreatedAt() : book.getUpdatedAt())
-            .build();
-    }
-
-    public BookDto convert(Book book) {
-        return BookDto.builder()
-            .id(book.getId())
-            .title(book.getTitle())
-            .author(book.getAuthor())
-            .coverImage(book.getCoverImage())
-            .description(book.getDescription())
-            .lastUpdatedAt(book.getUpdatedAt() == null ? book.getCreatedAt() : book.getUpdatedAt())
-            .categories(book.getCategories().stream().map(c -> categoryService.convertSimple(c)).toList())
-            .chapters(book.getChapters().stream().map(ch -> chapterService.convert(ch)).toList())
-            .averageRate(book.getRatings().stream()
-                        .mapToDouble(Rating::getStar)
-                        .average()
-                        .orElse(0.0))
-            .build();
     }
 }

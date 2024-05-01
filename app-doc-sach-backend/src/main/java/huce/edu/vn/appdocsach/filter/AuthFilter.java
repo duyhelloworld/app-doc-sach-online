@@ -11,8 +11,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import huce.edu.vn.appdocsach.services.auth.AuthUserService;
-import huce.edu.vn.appdocsach.services.auth.JwtService;
+import huce.edu.vn.appdocsach.services.impl.auth.AuthService;
+import huce.edu.vn.appdocsach.services.impl.auth.JwtService;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 import huce.edu.vn.appdocsach.utils.NamingUtil;
 import jakarta.servlet.FilterChain;
@@ -24,7 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class AuthFilter extends OncePerRequestFilter {
 
     @Autowired
-    private AuthUserService authUserService;
+    private AuthService authUserService;
 
     @Autowired
     private JwtService jwtService;

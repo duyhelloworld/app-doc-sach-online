@@ -1,4 +1,4 @@
-package huce.edu.vn.appdocsach.services.file;
+package huce.edu.vn.appdocsach.services.impl.file;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,6 +13,7 @@ import com.cloudinary.utils.ObjectUtils;
 import huce.edu.vn.appdocsach.constants.AppConst;
 import huce.edu.vn.appdocsach.enums.ResponseCode;
 import huce.edu.vn.appdocsach.exception.AppException;
+import huce.edu.vn.appdocsach.services.abstracts.file.ICloudinaryService;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class CloudinaryService {
+public class CloudinaryService implements ICloudinaryService {
 
     @Autowired
     private Cloudinary cloudinary; 
@@ -30,12 +31,14 @@ public class CloudinaryService {
 
     private Map<String, Object> map = new HashMap<>();
 
+    @Override
     public boolean isValidFileName(MultipartFile image) {
         String fileName = image.getOriginalFilename();
         return !StringUtils.containsWhitespace(fileName)
-            && AppConst.VALID_IMAGE_EXTENSION.contains(StringUtils.getFilenameExtension(fileName));
+            && AppConst.VALID_IMAGE_EXTENSIONS.contains(StringUtils.getFilenameExtension(fileName));
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public String save(byte[] file, String fileName) {
         Map<String, Object> response;
@@ -74,6 +77,7 @@ public class CloudinaryService {
         }
     }
 
+    @Override
     public void save(List<MultipartFile> files, String folderName) {
         createFolder(folderName);
         
@@ -101,6 +105,7 @@ public class CloudinaryService {
         }
     }
 
+    @Override
     public List<String> getUrls(String folderName) {
         logger.onStart(Thread.currentThread(), folderName);
         List<String> fileUrls = new LinkedList<>();
@@ -127,6 +132,7 @@ public class CloudinaryService {
         return fileUrls;
     }
 
+    @Override
     public String save(MultipartFile file) {
         try {
             return save(file.getBytes(), file.getOriginalFilename());
@@ -136,6 +142,7 @@ public class CloudinaryService {
         }
     }
 
+    @Override
     public void delete(String folderName) {
         map.clear();
         map.put("type", "upload");

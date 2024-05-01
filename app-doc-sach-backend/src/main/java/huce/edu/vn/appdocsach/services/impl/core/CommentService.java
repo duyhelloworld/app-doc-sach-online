@@ -1,4 +1,4 @@
-package huce.edu.vn.appdocsach.services.core;
+package huce.edu.vn.appdocsach.services.impl.core;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +17,9 @@ import huce.edu.vn.appdocsach.exception.AppException;
 import huce.edu.vn.appdocsach.paging.PagingResponse;
 import huce.edu.vn.appdocsach.repositories.ChapterRepo;
 import huce.edu.vn.appdocsach.repositories.CommentRepo;
+import huce.edu.vn.appdocsach.services.abstracts.core.ICommentService;
 import huce.edu.vn.appdocsach.utils.AppLogger;
+import huce.edu.vn.appdocsach.utils.ConvertUtils;
 import huce.edu.vn.appdocsach.paging.PagingHelper;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -25,7 +27,7 @@ import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CommentService {
+public class CommentService implements ICommentService {
 
     CommentRepo commentRepo;
 
@@ -39,6 +41,7 @@ public class CommentService {
         this.logger = new AppLogger<>(CommentService.class);
     }
 
+    @Override
     @Transactional
     public PagingResponse<CommentDto> getCommentsByChapter(FindCommentDto findCommentDto) {
         logger.onStart(Thread.currentThread(), findCommentDto);
@@ -46,21 +49,25 @@ public class CommentService {
                 PagingHelper.pageRequest(Comment.class, findCommentDto));
         PagingResponse<CommentDto> response = new PagingResponse<>();
         response.setTotalPage(comments.getTotalPages());
-        response.setValues(comments.map(c -> convert(c)).getContent());
+        response.setValues(comments.map(c -> ConvertUtils.convert(c)).getContent());
         return response;
     }
 
+    @Override
     public boolean isEmpty() {
         return commentRepo.count() == 0;
     }
 
+    @Override
     @Transactional
     public CommentDto getCommentById(Integer id) {
         logger.onStart(Thread.currentThread(), id);
-        return commentRepo.findById(id).map(c -> convert(c)).orElseThrow(
+        return commentRepo.findById(id).map(c -> ConvertUtils.convert(c))
+            .orElseThrow(
                 () -> new AppException(ResponseCode.COMMENT_NOT_FOUND));
     }
 
+    @Override
     @Transactional
     public Integer writeComment(User user, CreateCommentDto createCommentDto) {
         logger.onStart(Thread.currentThread(), user.getUsername(), createCommentDto);
@@ -76,6 +83,7 @@ public class CommentService {
         return comment.getId();
     }
 
+    @Override
     public CommentDto updateComment(User user, UpdateCommentDto updateCommentDto) {
         logger.onStart(Thread.currentThread(), updateCommentDto, user.getUsername());
         Comment comment = commentRepo.findById(updateCommentDto.getId())
@@ -87,9 +95,10 @@ public class CommentService {
         }
         comment.setContent(updateCommentDto.getContent());
         comment.setEditedAt(LocalDateTime.now());
-        return convert(commentRepo.save(comment));
+        return ConvertUtils.convert(commentRepo.save(comment));
     }
 
+    @Override
     @Transactional
     public void removeComment(Integer id, User user) {
         logger.onStart(Thread.currentThread(), id, user.getUsername());
@@ -101,13 +110,5 @@ public class CommentService {
         commentRepo.delete(comment);
     }
 
-    private CommentDto convert(Comment comment) {
-        return CommentDto.builder()
-                .commentAt(comment.getCreatedAt())
-                .content(comment.getContent())
-                .id(comment.getId())
-                .username(comment.getUser().getUsername())
-                .isEdited(comment.getEditedAt() != null)
-                .build();
-    }
+
 }

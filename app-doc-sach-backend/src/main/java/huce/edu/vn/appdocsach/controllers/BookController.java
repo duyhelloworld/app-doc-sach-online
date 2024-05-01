@@ -18,9 +18,9 @@ import huce.edu.vn.appdocsach.dto.core.book.FindBookDto;
 import huce.edu.vn.appdocsach.dto.core.book.SimpleBookDto;
 import huce.edu.vn.appdocsach.dto.core.rate.CreateRateDto;
 import huce.edu.vn.appdocsach.paging.PagingResponse;
-import huce.edu.vn.appdocsach.services.auth.users.AuthUser;
-import huce.edu.vn.appdocsach.services.core.BookService;
-import huce.edu.vn.appdocsach.services.core.RateService;
+import huce.edu.vn.appdocsach.services.abstracts.core.IBookService;
+import huce.edu.vn.appdocsach.services.abstracts.core.IRateService;
+import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
 import huce.edu.vn.appdocsach.utils.Mapper;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -38,11 +38,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BookController {
 
-    private Mapper mapper;
+    Mapper mapper;
 
-    private BookService bookService;
+    IBookService bookService;
 
-    private RateService rateService;
+    IRateService rateService;
 
     @Operation(summary = "Lấy tất cả sách cho trang home + Tìm kiếm theo thể loại & từ khóa")
     @GetMapping("all")

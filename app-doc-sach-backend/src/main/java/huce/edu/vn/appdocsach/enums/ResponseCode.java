@@ -30,7 +30,7 @@ public enum ResponseCode {
     // File working
     FILE_CONTENT_INVALID(1009, "Nội dung file không hợp lệ", HttpStatus.BAD_REQUEST),
     FILE_TYPE_INVALID(1010, "Tên file/loại file này không được hỗ trợ. Các loại file hỗ trợ là "
-        .formatted(AppConst.VALID_IMAGE_EXTENSION), HttpStatus.EXPECTATION_FAILED),
+        .formatted(AppConst.VALID_IMAGE_EXTENSIONS), HttpStatus.EXPECTATION_FAILED),
 
 
 

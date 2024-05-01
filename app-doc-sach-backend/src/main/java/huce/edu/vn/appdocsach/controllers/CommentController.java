@@ -13,8 +13,8 @@ import huce.edu.vn.appdocsach.dto.core.comment.CreateCommentDto;
 import huce.edu.vn.appdocsach.dto.core.comment.FindCommentDto;
 import huce.edu.vn.appdocsach.dto.core.comment.UpdateCommentDto;
 import huce.edu.vn.appdocsach.paging.PagingResponse;
-import huce.edu.vn.appdocsach.services.auth.users.AuthUser;
-import huce.edu.vn.appdocsach.services.core.CommentService;
+import huce.edu.vn.appdocsach.services.abstracts.core.ICommentService;
+import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +30,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CommentController {
 
-    CommentService commentService;
+    ICommentService commentService;
     
     @Operation(summary = "Lấy comment cho 1 chapter")
-    @GetMapping
+    @GetMapping("all")
     public PagingResponse<CommentDto> getAllByChapter(FindCommentDto findCommentDto) {
         return commentService.getCommentsByChapter(findCommentDto);
     }

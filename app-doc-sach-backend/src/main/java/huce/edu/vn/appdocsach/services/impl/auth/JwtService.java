@@ -1,4 +1,4 @@
-package huce.edu.vn.appdocsach.services.auth;
+package huce.edu.vn.appdocsach.services.impl.auth;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,8 +12,8 @@ import org.springframework.util.StringUtils;
 
 import huce.edu.vn.appdocsach.entities.Role;
 import huce.edu.vn.appdocsach.entities.User;
-import huce.edu.vn.appdocsach.services.auth.users.AuthUser;
-import huce.edu.vn.appdocsach.services.auth.users.ClaimType;
+import huce.edu.vn.appdocsach.services.abstracts.auth.IJwtService;
+import huce.edu.vn.appdocsach.services.impl.auth.users.ClaimType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class JwtService {
+public class JwtService implements IJwtService {
 
     @Value("${application.jwt.secret}")
     private String secretKey;
@@ -37,6 +37,7 @@ public class JwtService {
     @Value("${application.jwt.issuer}")
     private String issuer;
 
+    @Override
     public String getTokenFromRequest(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (StringUtils.hasText(header) && header.startsWith("Bearer ")) {
@@ -45,14 +46,12 @@ public class JwtService {
         return null;
     }
 
-    public String buildToken(AuthUser authUser) {
-        return buildToken(authUser.getUsername(), authUser.getEmail(), authUser.getRole());
-    }
-
+    @Override
     public String buildToken(User user) {
         return buildToken(user.getUsername(), user.getEmail(), user.getRole());
     }
 
+    @Override
     public boolean isValidToken(String token) {
         try {
             getParser().parseSignedClaims(token);
@@ -67,8 +66,12 @@ public class JwtService {
         return false;
     }
 
+    @Override
     public String getUsername(String token) {
-        return getStringValue(extractAllClaims(token).get(ClaimType.USERNAME.name()));
+        Object obj = extractAllClaims(token).get(ClaimType.USERNAME.name());
+        return obj == null
+                ? String.valueOf(obj)
+                : "";
     }
 
     private JwtParser getParser() {
@@ -100,10 +103,6 @@ public class JwtService {
                 .expiration(getDate(LocalDateTime.now().plusDays(expiration)))
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
-    }
-
-    private String getStringValue(Object obj) {
-        return obj != null ? String.valueOf(obj) : "";
     }
 
     private Date getDate(LocalDateTime dateTime) {

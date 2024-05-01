@@ -1,8 +1,7 @@
-package huce.edu.vn.appdocsach.services.auth;
+package huce.edu.vn.appdocsach.services.impl.auth;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,37 +24,50 @@ import huce.edu.vn.appdocsach.entities.User;
 import huce.edu.vn.appdocsach.enums.ResponseCode;
 import huce.edu.vn.appdocsach.exception.AppException;
 import huce.edu.vn.appdocsach.repositories.UserRepo;
-import huce.edu.vn.appdocsach.services.auth.users.AuthUser;
-import huce.edu.vn.appdocsach.services.auth.users.LocalUser;
-import huce.edu.vn.appdocsach.services.auth.users.OAuthFactory;
-import huce.edu.vn.appdocsach.services.file.CloudinaryService;
+import huce.edu.vn.appdocsach.services.abstracts.auth.IAuthService;
+import huce.edu.vn.appdocsach.services.abstracts.auth.IJwtService;
+import huce.edu.vn.appdocsach.services.abstracts.file.ICloudinaryService;
+import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
+import huce.edu.vn.appdocsach.services.impl.auth.users.LocalUser;
+import huce.edu.vn.appdocsach.services.impl.auth.users.OAuthFactory;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 @Service
-public class AuthUserService extends DefaultOAuth2UserService implements UserDetailsService {
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class AuthService extends DefaultOAuth2UserService implements IAuthService, UserDetailsService {
 
-    @Autowired
-    private UserRepo userRepo;
+    UserRepo userRepo;
     
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
     
-    @Autowired
-    private JwtService jwtService;
+    IJwtService jwtService;
     
-    @Autowired
-    private CloudinaryService cloudinaryService;
+    ICloudinaryService cloudinaryService;
 
-    private AppLogger<AuthUserService> logger = new AppLogger<>(AuthUserService.class);
+    AppLogger<AuthService> logger ;
 
+    public AuthService(UserRepo userRepo, PasswordEncoder passwordEncoder, 
+            IJwtService jwtService, 
+            ICloudinaryService cloudinaryService) {
+        this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.cloudinaryService = cloudinaryService;
+        this.logger = new AppLogger<>(AuthService.class);
+    }
+
+    @Override
     public void signOut(AuthUser authUser, HttpServletRequest request) {
         logger.onStart(Thread.currentThread(), authUser);
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
+    @Override
     @Transactional
     public AuthDto signIn(@Valid SigninDto signinDto) {
         logger.onStart(Thread.currentThread(), signinDto);
@@ -69,13 +81,14 @@ public class AuthUserService extends DefaultOAuth2UserService implements UserDet
         throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
     }
 
+    @Override
     @Transactional
     public AuthDto signUp(@Valid SignupDto signupDto, MultipartFile avatar) {
         String avatarUrl;
         String username = signupDto.getUsername();
         if (avatar == null) {
             avatarUrl = AppConst.DEFAULT_AVATAR_URL;
-            logger.onStart(Thread.currentThread(), username, "Avatar = ", AppConst.DEFAULT_AVATAR_FILENAME_WITH_EXTENSION);
+            logger.onStart(Thread.currentThread(), username, "Avatar = ", AppConst.DEFAULT_AVATAR_FILENAME);
         } else {
             if (!cloudinaryService.isValidFileName(avatar)) {
                 throw new AppException(ResponseCode.FILE_TYPE_INVALID);
@@ -157,7 +170,7 @@ public class AuthUserService extends DefaultOAuth2UserService implements UserDet
         authDto.setEmail(user.getEmail());
         authDto.setFullname(user.getFullname());
         authDto.setUsername(user.getUsername());
-        authDto.setJwt(jwtService.buildToken(LocalUser.getInstance(user)));
+        authDto.setJwt(jwtService.buildToken(user));
         return authDto;
     }
 }

@@ -11,7 +11,7 @@ import huce.edu.vn.appdocsach.annotations.auth.IsAdmin;
 import huce.edu.vn.appdocsach.dto.core.category.CategoryDto;
 import huce.edu.vn.appdocsach.dto.core.category.CreateCategoryDto;
 import huce.edu.vn.appdocsach.dto.core.category.SimpleCategoryDto;
-import huce.edu.vn.appdocsach.services.core.CategoryService;
+import huce.edu.vn.appdocsach.services.abstracts.core.ICategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CategoryController {
 
-    CategoryService categoryService;
+    ICategoryService categoryService;
 
     @Operation(summary = "Tìm tất cả thể loại, lấy cho trang home")
     @GetMapping("all")

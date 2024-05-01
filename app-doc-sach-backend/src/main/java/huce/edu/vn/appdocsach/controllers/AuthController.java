@@ -12,8 +12,8 @@ import huce.edu.vn.appdocsach.annotations.auth.IsAuthenticated;
 import huce.edu.vn.appdocsach.dto.auth.AuthDto;
 import huce.edu.vn.appdocsach.dto.auth.SigninDto;
 import huce.edu.vn.appdocsach.dto.auth.SignupDto;
-import huce.edu.vn.appdocsach.services.auth.AuthUserService;
-import huce.edu.vn.appdocsach.services.auth.users.AuthUser;
+import huce.edu.vn.appdocsach.services.abstracts.auth.IAuthService;
+import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
 import huce.edu.vn.appdocsach.utils.Mapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
     
-    AuthUserService authService;
+    IAuthService authService;
 
     Mapper mapper; 
 

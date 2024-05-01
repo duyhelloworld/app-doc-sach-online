@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +16,7 @@ import huce.edu.vn.appdocsach.dto.core.chapter.CreateChapterDto;
 import huce.edu.vn.appdocsach.dto.core.chapter.FindChapterDto;
 import huce.edu.vn.appdocsach.dto.core.chapter.SimpleChapterDto;
 import huce.edu.vn.appdocsach.paging.PagingResponse;
-import huce.edu.vn.appdocsach.services.core.ChapterService;
+import huce.edu.vn.appdocsach.services.abstracts.core.IChapterService;
 import huce.edu.vn.appdocsach.utils.Mapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,10 +32,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChapterController {
 
-    ChapterService chapterService;
+    IChapterService chapterService;
 
-    @Autowired
-    private Mapper mapper;
+    Mapper mapper;
 
     @Operation(summary = "Lấy thông tin các chapter gần đây")
     @GetMapping

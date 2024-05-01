@@ -1,4 +1,4 @@
-package huce.edu.vn.appdocsach.services.core;
+package huce.edu.vn.appdocsach.services.impl.core;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,8 +18,10 @@ import huce.edu.vn.appdocsach.exception.AppException;
 import huce.edu.vn.appdocsach.paging.PagingResponse;
 import huce.edu.vn.appdocsach.repositories.BookRepo;
 import huce.edu.vn.appdocsach.repositories.ChapterRepo;
-import huce.edu.vn.appdocsach.services.file.CloudinaryService;
+import huce.edu.vn.appdocsach.services.abstracts.core.IChapterService;
+import huce.edu.vn.appdocsach.services.abstracts.file.ICloudinaryService;
 import huce.edu.vn.appdocsach.utils.AppLogger;
+import huce.edu.vn.appdocsach.utils.ConvertUtils;
 import huce.edu.vn.appdocsach.utils.NamingUtil;
 import huce.edu.vn.appdocsach.paging.PagingHelper;
 import jakarta.transaction.Transactional;
@@ -28,23 +30,24 @@ import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ChapterService {
+public class ChapterService implements IChapterService {
 
     ChapterRepo chapterRepo;
 
     BookRepo bookRepo;
 
-    CloudinaryService cloudinaryService;
+    ICloudinaryService cloudinaryService;
 
     AppLogger<ChapterService> logger ;
 
-    public ChapterService(ChapterRepo chapterRepo, BookRepo bookRepo, CloudinaryService cloudinaryService) {
+    public ChapterService(ChapterRepo chapterRepo, BookRepo bookRepo, ICloudinaryService cloudinaryService) {
         this.chapterRepo = chapterRepo;
         this.bookRepo = bookRepo;
         this.cloudinaryService = cloudinaryService;
         this.logger = new AppLogger<>(ChapterService.class);
     }
 
+    @Override
     @Transactional
     public List<String> getChapter(Integer id) {
         logger.onStart(Thread.currentThread(), id);
@@ -53,10 +56,12 @@ public class ChapterService {
         return cloudinaryService.getUrls(chapter.getFolderName());
     }
 
+    @Override
     public boolean isEmpty() {
         return chapterRepo.count() == 0;
     }
 
+    @Override
     @Transactional
     public PagingResponse<SimpleChapterDto> getAllChapterSimple(FindChapterDto findChapterDto) {
         logger.onStart(Thread.currentThread(), findChapterDto);
@@ -64,10 +69,11 @@ public class ChapterService {
         Page<Chapter> chapters = chapterRepo.findByBookId(findChapterDto.getBookId(), pageRequest);
         PagingResponse<SimpleChapterDto> response = new PagingResponse<>();
         response.setTotalPage(chapters.getTotalPages());
-        response.setValues(chapters.map(c -> convert(c)).getContent());
+        response.setValues(chapters.map(c -> ConvertUtils.convert(c)).getContent());
         return response;
     }
 
+    @Override
     @Transactional
     public Integer create(List<MultipartFile> files, CreateChapterDto createChapterDto) {
         Book book = bookRepo.findById(createChapterDto.getBookId())
@@ -90,13 +96,5 @@ public class ChapterService {
         chapter.setBook(book);
         chapterRepo.save(chapter);
         return chapter.getId();
-    }
-
-    public SimpleChapterDto convert(Chapter chapter) {
-        return SimpleChapterDto.builder()
-            .id(chapter.getId())
-            .title(chapter.getTitle())
-            .lastUpdatedAt(chapter.getUpdatedAt() == null ? chapter.getCreatedAt() : chapter.getUpdatedAt())
-            .build();
     }
 }

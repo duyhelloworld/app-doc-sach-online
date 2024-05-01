@@ -1,4 +1,4 @@
-package huce.edu.vn.appdocsach.services.core;
+package huce.edu.vn.appdocsach.services.impl.core;
 
 import java.util.Optional;
 
@@ -12,6 +12,7 @@ import huce.edu.vn.appdocsach.enums.ResponseCode;
 import huce.edu.vn.appdocsach.exception.AppException;
 import huce.edu.vn.appdocsach.repositories.BookRepo;
 import huce.edu.vn.appdocsach.repositories.RatingRepo;
+import huce.edu.vn.appdocsach.services.abstracts.core.IRateService;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -19,7 +20,7 @@ import lombok.experimental.FieldDefaults;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class RateService {
+public class RateService implements IRateService {
 
     RatingRepo ratingRepo;
 
@@ -32,7 +33,8 @@ public class RateService {
         this.bookRepo = bookRepo;
         this.logger = new AppLogger<>(RateService.class);
     }
-
+    
+    @Override
     @Transactional
     public void toggerRate(User user, CreateRateDto createRateDto, Integer bookId) {
         logger.onStart(Thread.currentThread(), user.getUsername(), createRateDto);

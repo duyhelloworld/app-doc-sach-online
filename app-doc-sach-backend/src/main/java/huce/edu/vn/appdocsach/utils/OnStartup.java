@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -18,32 +17,39 @@ import huce.edu.vn.appdocsach.entities.User;
 import huce.edu.vn.appdocsach.paging.PagingHelper;
 import huce.edu.vn.appdocsach.repositories.CategoryRepo;
 import huce.edu.vn.appdocsach.repositories.UserRepo;
-import huce.edu.vn.appdocsach.services.core.BookService;
-import huce.edu.vn.appdocsach.services.core.ChapterService;
-import huce.edu.vn.appdocsach.services.core.CommentService;
+import huce.edu.vn.appdocsach.services.abstracts.core.IBookService;
+import huce.edu.vn.appdocsach.services.abstracts.core.IChapterService;
+import huce.edu.vn.appdocsach.services.abstracts.core.ICommentService;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 
 @Component
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OnStartup implements CommandLineRunner {
 
-    @Autowired
-    private UserRepo userRepo;
+	UserRepo userRepo;
 
-    @Autowired
-    private CategoryRepo categoryRepo;
+	CategoryRepo categoryRepo;
 
-    @Autowired
-    private BookService bookService;
+	IBookService bookService;
 
-    @Autowired
-    private ChapterService chapterService;
+	IChapterService chapterService;
 
-    @Autowired
-    private CommentService commentService;
+	ICommentService commentService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+	PasswordEncoder passwordEncoder;
 
-    private AppLogger<OnStartup> logger = new AppLogger<>(OnStartup.class);
+	AppLogger<OnStartup> logger;
+
+	public OnStartup(UserRepo userRepo, CategoryRepo categoryRepo, IBookService bookService, IChapterService chapterService, ICommentService commentService, PasswordEncoder passwordEncoder) {
+        this.userRepo = userRepo;
+        this.categoryRepo = categoryRepo;
+        this.bookService = bookService;
+        this.chapterService = chapterService;
+        this.commentService = commentService;
+        this.passwordEncoder = passwordEncoder;
+        this.logger = new AppLogger<>(OnStartup.class);
+	}
 
     @Override
     public void run(String... args) throws Exception {
