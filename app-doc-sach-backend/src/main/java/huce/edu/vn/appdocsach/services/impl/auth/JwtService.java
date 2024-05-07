@@ -12,6 +12,8 @@ import org.springframework.util.StringUtils;
 
 import huce.edu.vn.appdocsach.entities.Role;
 import huce.edu.vn.appdocsach.entities.User;
+import huce.edu.vn.appdocsach.enums.ResponseCode;
+import huce.edu.vn.appdocsach.exception.AppException;
 import huce.edu.vn.appdocsach.services.abstracts.auth.IJwtService;
 import huce.edu.vn.appdocsach.services.impl.auth.users.ClaimType;
 import io.jsonwebtoken.Claims;
@@ -69,9 +71,10 @@ public class JwtService implements IJwtService {
     @Override
     public String getUsername(String token) {
         Object obj = extractAllClaims(token).get(ClaimType.USERNAME.name());
-        return obj == null
-                ? String.valueOf(obj)
-                : "";
+        if (obj == null) {
+            throw new AppException(ResponseCode.USERNAME_NOT_FOUND);
+        }
+        return obj.toString();
     }
 
     private JwtParser getParser() {

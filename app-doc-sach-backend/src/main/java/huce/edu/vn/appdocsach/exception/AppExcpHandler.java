@@ -21,9 +21,9 @@ public class AppExcpHandler {
     @ExceptionHandler({ Exception.class })
     ResponseEntity<ErrorResponse> handleAppException(Exception ex) {
         
-        logger.error(ex.getLocalizedMessage());
+        logger.error(ex.getMessage());
 
-        // Custom Exception đã định nghĩa --> Không cần thiết in log lắm
+        // Custom Exception đã định nghĩa
         if (ex instanceof AppException appEx) {
             return writeResponse(appEx.getResponseCode());
         }

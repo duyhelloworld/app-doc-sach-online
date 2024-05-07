@@ -27,7 +27,7 @@ public class AppDocSachApplication {
 	}
 
 	@Bean
-	public Cloudinary init() {
+	Cloudinary init() {
 		Cloudinary cloudinary = new Cloudinary();
 		cloudinary.config.cloudName = cloudName;
 		cloudinary.config.apiKey = apiKey;
@@ -38,7 +38,7 @@ public class AppDocSachApplication {
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 }

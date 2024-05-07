@@ -1,5 +1,6 @@
 package huce.edu.vn.appdocsach.utils;
 
+import huce.edu.vn.appdocsach.dto.auth.AuthDto;
 import huce.edu.vn.appdocsach.dto.core.book.BookDto;
 import huce.edu.vn.appdocsach.dto.core.book.SimpleBookDto;
 import huce.edu.vn.appdocsach.dto.core.category.CategoryDto;
@@ -11,6 +12,7 @@ import huce.edu.vn.appdocsach.entities.Category;
 import huce.edu.vn.appdocsach.entities.Chapter;
 import huce.edu.vn.appdocsach.entities.Comment;
 import huce.edu.vn.appdocsach.entities.Rating;
+import huce.edu.vn.appdocsach.entities.User;
 
 public class ConvertUtils {
     
@@ -73,5 +75,14 @@ public class ConvertUtils {
                 .id(category.getId())
                 .name(category.getName())
                 .build();
+    }
+
+    public static AuthDto convert(User user, String token) {
+        AuthDto authDto = new AuthDto();
+        authDto.setEmail(user.getEmail());
+        authDto.setFullname(user.getFullname());
+        authDto.setUsername(user.getUsername());
+        authDto.setJwt(token);
+        return authDto;
     }
 }

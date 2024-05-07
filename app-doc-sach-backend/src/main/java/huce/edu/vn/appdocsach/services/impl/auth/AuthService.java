@@ -31,6 +31,7 @@ import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
 import huce.edu.vn.appdocsach.services.impl.auth.users.LocalUser;
 import huce.edu.vn.appdocsach.services.impl.auth.users.OAuthFactory;
 import huce.edu.vn.appdocsach.utils.AppLogger;
+import huce.edu.vn.appdocsach.utils.ConvertUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -76,7 +77,7 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
             throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
         }
         if (passwordEncoder.matches(signinDto.getPassword(), user.getPassword())) {
-            return getResponse(user);
+            return ConvertUtils.convert(user, jwtService.buildToken(user));
         }
         throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
     }
@@ -108,7 +109,7 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
         user.setProvider(TokenProvider.LOCAL);
         user.setRole(Role.USER);
         userRepo.save(user);
-        return getResponse(user);
+        return ConvertUtils.convert(user, jwtService.buildToken(user));
     }
 
     @Override
@@ -139,11 +140,9 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
     }
 
     private User loadUser(String username) {
-        Optional<User> users = userRepo.findByUsername(username);
-        if (users.isEmpty()) {
-            return null;
-        }
-        return users.get();
+        Optional<User> user = userRepo.findByUsername(username);
+        logger.info(user);
+        return user.isEmpty() ? null : user.get();
     }
 
     private User registerNewOauthUser(AuthUser authUser) {
@@ -163,14 +162,5 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
         } catch (Exception e) {
             throw new AppException(ResponseCode.UNAUTHORIZED);
         }
-    }
-
-    private AuthDto getResponse(User user) {
-        AuthDto authDto = new AuthDto();
-        authDto.setEmail(user.getEmail());
-        authDto.setFullname(user.getFullname());
-        authDto.setUsername(user.getUsername());
-        authDto.setJwt(jwtService.buildToken(user));
-        return authDto;
     }
 }
