@@ -1,6 +1,5 @@
 package huce.edu.vn.appdocsach.services.impl.core;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -8,9 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
-import huce.edu.vn.appdocsach.constants.AppConst;
 import huce.edu.vn.appdocsach.dto.core.book.BookDto;
 import huce.edu.vn.appdocsach.dto.core.book.CreateBookDto;
 import huce.edu.vn.appdocsach.dto.core.book.FindBookDto;
@@ -55,9 +52,10 @@ public class BookService implements IBookService {
     public PagingResponse<SimpleBookDto> getAllBookSimple(FindBookDto findBookDto) {
         logger.onStart(Thread.currentThread(), findBookDto);
         Pageable pageRequest = PagingHelper.pageRequest(Book.class, findBookDto);
-        Page<Book> books;
         Integer cid = findBookDto.getCategoryId();
         String keyword = findBookDto.getKeyword();
+
+        Page<Book> books;
         if (StringUtils.hasText(keyword)) {
             books = bookRepo.search(keyword, pageRequest);
         } else if (cid != 0) {
@@ -86,28 +84,10 @@ public class BookService implements IBookService {
 
     @Override
     @Transactional
-    public Integer addBook(CreateBookDto createBookDto, MultipartFile coverImage) {
-        try {
-            return coverImage != null 
-                ? addBook(createBookDto, coverImage.getBytes(), coverImage.getOriginalFilename()) 
-                : addBook(createBookDto, null, null);
-        } catch (IOException e) {
-            logger.error(e);
-            return 0;
-        }
-    }
-
-    @Override
-    @Transactional
     public Integer addBook(CreateBookDto createBookDto, byte[] coverImage, String fileName) {
         String coverImageUrl;
-        if (coverImage != null) {
-            logger.onStart(Thread.currentThread(), createBookDto, "Cover image : ", fileName);
-            coverImageUrl = cloudinaryService.save(coverImage, fileName);
-        } else {
-            logger.onStart(Thread.currentThread(), createBookDto, "Cover image : ", null);
-            coverImageUrl = AppConst.DEFAULT_COVER_IMAGE_URL;
-        }
+        logger.onStart(Thread.currentThread(), createBookDto, "Cover image : ", fileName);
+        coverImageUrl = cloudinaryService.save(coverImage, fileName);
         if (bookRepo.existsByTitle(createBookDto.getTitle())) {
             throw new AppException(ResponseCode.BOOK_TITLE_EXISTED);
         }

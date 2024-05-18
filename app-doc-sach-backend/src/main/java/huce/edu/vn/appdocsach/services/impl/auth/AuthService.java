@@ -1,7 +1,5 @@
 package huce.edu.vn.appdocsach.services.impl.auth;
 
-import java.util.Optional;
-
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,7 +12,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import huce.edu.vn.appdocsach.constants.AppConst;
 import huce.edu.vn.appdocsach.dto.auth.AuthDto;
 import huce.edu.vn.appdocsach.dto.auth.SigninDto;
 import huce.edu.vn.appdocsach.dto.auth.SignupDto;
@@ -50,7 +47,7 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
     
     ICloudinaryService cloudinaryService;
 
-    AppLogger<AuthService> logger ;
+    AppLogger<AuthService> logger;
 
     public AuthService(UserRepo userRepo, PasswordEncoder passwordEncoder, 
             IJwtService jwtService, 
@@ -77,7 +74,7 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
             throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
         }
         if (passwordEncoder.matches(signinDto.getPassword(), user.getPassword())) {
-            return ConvertUtils.convert(user, jwtService.buildToken(user));
+            return ConvertUtils.convert(user.getFullname(), jwtService.buildToken(user));
         }
         throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
     }
@@ -85,18 +82,15 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
     @Override
     @Transactional
     public AuthDto signUp(@Valid SignupDto signupDto, MultipartFile avatar) {
-        String avatarUrl;
         String username = signupDto.getUsername();
         if (avatar == null) {
-            avatarUrl = AppConst.DEFAULT_AVATAR_URL;
-            logger.onStart(Thread.currentThread(), username, "Avatar = ", AppConst.DEFAULT_AVATAR_FILENAME);
-        } else {
-            if (!cloudinaryService.isValidFileName(avatar)) {
-                throw new AppException(ResponseCode.FILE_TYPE_INVALID);
-            }
-            logger.onStart(Thread.currentThread(), username, "Avatar = ", avatar.getOriginalFilename());
-            avatarUrl = cloudinaryService.save(avatar);
+            throw new AppException(ResponseCode.FILE_CONTENT_MISSING);
+        } 
+        if (!cloudinaryService.isValidFileName(avatar)) {
+            throw new AppException(ResponseCode.FILE_TYPE_INVALID);
         }
+        logger.onStart(Thread.currentThread(), username, "Avatar = ", avatar.getOriginalFilename());
+        String avatarUrl = cloudinaryService.save(avatar);
         if (userRepo.existsByUsername(username)) {
             throw new AppException(ResponseCode.USERNAME_EXISTED);
         }
@@ -109,13 +103,12 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
         user.setProvider(TokenProvider.LOCAL);
         user.setRole(Role.USER);
         userRepo.save(user);
-        return ConvertUtils.convert(user, jwtService.buildToken(user));
+        return ConvertUtils.convert(user.getFullname(), jwtService.buildToken(user));
     }
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        logger.onStart(Thread.currentThread(), username);
         User user = loadUser(username);
         if (user == null) {
             throw new AppException(ResponseCode.UNAUTHORIZED);
@@ -126,7 +119,6 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
     @Override
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest request) throws OAuth2AuthenticationException {
-        logger.onStart(Thread.currentThread(), request);
         OAuth2User loadedOAuthUser = super.loadUser(request);
         TokenProvider provider = TokenProvider
                 .valueOf(request.getClientRegistration().getRegistrationId().toLowerCase());
@@ -140,9 +132,7 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
     }
 
     private User loadUser(String username) {
-        Optional<User> user = userRepo.findByUsername(username);
-        logger.info(user);
-        return user.isEmpty() ? null : user.get();
+        return userRepo.findByUsername(username).orElse(null);
     }
 
     private User registerNewOauthUser(AuthUser authUser) {

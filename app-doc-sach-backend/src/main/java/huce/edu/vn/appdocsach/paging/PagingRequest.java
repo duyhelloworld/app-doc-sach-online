@@ -1,7 +1,5 @@
 package huce.edu.vn.appdocsach.paging;
 
-import org.springframework.util.StringUtils;
-
 import huce.edu.vn.appdocsach.constants.AppConst;
 import lombok.Setter;
 
@@ -10,8 +8,6 @@ public class PagingRequest {
     private Integer pageSize;
     
     private Integer pageNumber;
-
-    private String sortBy;
 
     public Integer getPageSize() {
         if (pageSize > AppConst.MAX_PAGE_SIZE) {
@@ -24,9 +20,5 @@ public class PagingRequest {
 
     public Integer getPageNumber() {
         return this.pageNumber < 1 ? AppConst.DEFAULT_PAGE_NUMBER : this.pageNumber;
-    }
-
-    public String getSortBy() {
-        return StringUtils.hasText(sortBy) ? this.sortBy : AppConst.DEFAULT_SORT_BY;
     }
 }

@@ -1,7 +1,5 @@
 package huce.edu.vn.appdocsach.services.abstracts.core;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import huce.edu.vn.appdocsach.dto.core.book.BookDto;
 import huce.edu.vn.appdocsach.dto.core.book.CreateBookDto;
 import huce.edu.vn.appdocsach.dto.core.book.FindBookDto;
@@ -16,7 +14,5 @@ public interface IBookService {
 
     BookDto getBookById(Integer id);
 
-    Integer addBook(CreateBookDto createBookDto, MultipartFile coverImage);
-    
     Integer addBook(CreateBookDto createBookDto, byte[] coverImage, String fileName);
 }

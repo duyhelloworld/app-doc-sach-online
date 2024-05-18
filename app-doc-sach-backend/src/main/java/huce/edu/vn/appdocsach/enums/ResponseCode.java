@@ -31,7 +31,7 @@ public enum ResponseCode {
     FILE_CONTENT_INVALID(1009, "Nội dung file không hợp lệ", HttpStatus.BAD_REQUEST),
     FILE_TYPE_INVALID(1010, "Tên file/loại file này không được hỗ trợ. Các loại file hỗ trợ là "
         .formatted(AppConst.VALID_IMAGE_EXTENSIONS), HttpStatus.EXPECTATION_FAILED),
-
+    FILE_CONTENT_MISSING(2014, "Thiếu file gửi lên", HttpStatus.NOT_FOUND),
 
 
     // Bussiness Logic Code
@@ -54,6 +54,7 @@ public enum ResponseCode {
     CHAPTER_TITLE_EXISTED(2011,"Tiêu đề chương truyện này đã tồn tại", HttpStatus.BAD_REQUEST),
     CHAPTER_TITLE_INVALID(2012, "Tiêu đề truyện không thể chuẩn hóa.", HttpStatus.BAD_REQUEST),
     STAR_OUT_OF_RANGE(2013, Star.ERROR_MESSAGE, HttpStatus.BAD_REQUEST);
+    
 
     @Getter
     private String message;

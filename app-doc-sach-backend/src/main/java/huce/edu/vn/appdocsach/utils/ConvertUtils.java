@@ -1,5 +1,7 @@
 package huce.edu.vn.appdocsach.utils;
 
+import java.util.Optional;
+
 import huce.edu.vn.appdocsach.dto.auth.AuthDto;
 import huce.edu.vn.appdocsach.dto.core.book.BookDto;
 import huce.edu.vn.appdocsach.dto.core.book.SimpleBookDto;
@@ -12,7 +14,6 @@ import huce.edu.vn.appdocsach.entities.Category;
 import huce.edu.vn.appdocsach.entities.Chapter;
 import huce.edu.vn.appdocsach.entities.Comment;
 import huce.edu.vn.appdocsach.entities.Rating;
-import huce.edu.vn.appdocsach.entities.User;
 
 public class ConvertUtils {
     
@@ -33,7 +34,7 @@ public class ConvertUtils {
                 .author(book.getAuthor())
                 .coverImage(book.getCoverImage())
                 .description(book.getDescription())
-                .lastUpdatedAt(book.getUpdatedAt() == null ? book.getCreatedAt() : book.getUpdatedAt())
+                .lastUpdatedAt(Optional.ofNullable(book.getUpdatedAt()).orElse(book.getCreatedAt()))
                 .categories(book.getCategories().stream().map(c -> convertSimple(c)).toList())
                 .chapters(book.getChapters().stream().map(ch -> convert(ch)).toList())
                 .averageRate(book.getRatings().stream()
@@ -77,11 +78,9 @@ public class ConvertUtils {
                 .build();
     }
 
-    public static AuthDto convert(User user, String token) {
+    public static AuthDto convert(String fullname, String token) {
         AuthDto authDto = new AuthDto();
-        authDto.setEmail(user.getEmail());
-        authDto.setFullname(user.getFullname());
-        authDto.setUsername(user.getUsername());
+        authDto.setFullname(fullname);
         authDto.setJwt(token);
         return authDto;
     }

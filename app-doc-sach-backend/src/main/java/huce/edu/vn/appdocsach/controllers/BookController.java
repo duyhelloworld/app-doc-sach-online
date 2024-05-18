@@ -1,5 +1,7 @@
 package huce.edu.vn.appdocsach.controllers;
 
+import java.io.IOException;
+
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,20 +58,18 @@ public class BookController {
         return bookService.getBookById(id);
     }
 
-    @Operation(summary = "Thêm mới 1 sách với ảnh bìa mặc định")
-    @IsAdmin
-    @PostMapping("without-cover")
-    public Integer addNew(@AuthenticationPrincipal AuthUser authUser, @RequestBody CreateBookDto createBookDto) {
-        return bookService.addBook(createBookDto, null);
-    }
-
     @Operation(summary = "Thêm mới 1 sách với ảnh bìa cung cấp")
     @IsAdmin
     @PostMapping(path = "with-cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Integer addNewWithImage(@AuthenticationPrincipal AuthUser authUser,
             @RequestPart String jsonCreateBookDto,
-            @RequestPart MultipartFile coverImage) {
-        return bookService.addBook(mapper.getInstance(jsonCreateBookDto, CreateBookDto.class), coverImage);
+            @RequestPart(required = true) MultipartFile coverImage) {
+        try {
+            return bookService.addBook(mapper.getInstance(jsonCreateBookDto, CreateBookDto.class), coverImage.getBytes(), coverImage.getOriginalFilename());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     @Operation(summary = "Nhấn đánh giá 1 sách. Gọi lần nữa để hủy")

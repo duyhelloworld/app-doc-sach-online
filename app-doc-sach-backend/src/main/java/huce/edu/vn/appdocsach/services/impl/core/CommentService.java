@@ -88,8 +88,6 @@ public class CommentService implements ICommentService {
         logger.onStart(Thread.currentThread(), updateCommentDto, user.getUsername());
         Comment comment = commentRepo.findById(updateCommentDto.getId())
                 .orElseThrow(() -> new AppException(ResponseCode.COMMENT_NOT_FOUND));
-                logger.info(user);
-                logger.info(comment.getUser());
         if (!comment.getUser().equals(user)) {
             throw new AppException(ResponseCode.DONT_HAVE_EDIT_COMMENT_PERMISSION);
         }

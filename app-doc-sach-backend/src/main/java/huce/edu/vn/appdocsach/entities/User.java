@@ -55,6 +55,7 @@ public class User {
     private List<Rating> ratings = new ArrayList<>();
 
     @JsonIgnore
+    @OneToMany
     private List<History> histories = new ArrayList<>();
 
     @Override

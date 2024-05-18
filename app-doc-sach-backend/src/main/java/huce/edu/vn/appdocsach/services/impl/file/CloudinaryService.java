@@ -16,7 +16,6 @@ import huce.edu.vn.appdocsach.exception.AppException;
 import huce.edu.vn.appdocsach.services.abstracts.file.ICloudinaryService;
 import huce.edu.vn.appdocsach.utils.AppLogger;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,8 +23,11 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class CloudinaryService implements ICloudinaryService {
 
-    @Autowired
-    private Cloudinary cloudinary; 
+    Cloudinary cloudinary; 
+
+    public CloudinaryService(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
+    }
     
     private AppLogger<CloudinaryService> logger = new AppLogger<>(CloudinaryService.class);
 
@@ -50,7 +52,7 @@ public class CloudinaryService implements ICloudinaryService {
             map.put("use_filename", true);
             map.put("unique_filename", false);
             map.put("public_id", fileName);
-            map.put("overwrite", false);
+            map.put("overwrite", true);
             response = cloudinary.uploader().upload(file, map);
             // logger.info(response);
             if (response.containsKey("error")) {
@@ -114,6 +116,7 @@ public class CloudinaryService implements ICloudinaryService {
         map.put("return_error", true);
         map.put("type", "upload");
         map.put("prefix", folderName);
+        map.put("max_results", AppConst.MAX_FILE_RETURN_IN_LOAD_A_CHAPTER);
         try {
             response = cloudinary.api().resources(map);
             if (response.containsKey("error")) {
