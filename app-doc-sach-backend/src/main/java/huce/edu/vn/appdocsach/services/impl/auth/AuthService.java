@@ -74,7 +74,7 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
             throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
         }
         if (passwordEncoder.matches(signinDto.getPassword(), user.getPassword())) {
-            return ConvertUtils.convert(user.getFullname(), jwtService.buildToken(user));
+            return ConvertUtils.convert(user, jwtService.buildToken(user));
         }
         throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
     }
@@ -103,7 +103,7 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
         user.setProvider(TokenProvider.LOCAL);
         user.setRole(Role.USER);
         userRepo.save(user);
-        return ConvertUtils.convert(user.getFullname(), jwtService.buildToken(user));
+        return ConvertUtils.convert(user, jwtService.buildToken(user));
     }
 
     @Override

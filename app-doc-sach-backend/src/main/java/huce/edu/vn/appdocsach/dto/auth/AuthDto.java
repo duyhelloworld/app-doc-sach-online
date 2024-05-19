@@ -6,4 +6,5 @@ import lombok.Data;
 public class AuthDto {
     private String jwt;
     private String fullname;
+    private String avatar;
 }

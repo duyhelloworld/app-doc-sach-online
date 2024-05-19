@@ -14,6 +14,7 @@ import huce.edu.vn.appdocsach.entities.Category;
 import huce.edu.vn.appdocsach.entities.Chapter;
 import huce.edu.vn.appdocsach.entities.Comment;
 import huce.edu.vn.appdocsach.entities.Rating;
+import huce.edu.vn.appdocsach.entities.User;
 
 public class ConvertUtils {
     
@@ -78,10 +79,11 @@ public class ConvertUtils {
                 .build();
     }
 
-    public static AuthDto convert(String fullname, String token) {
+    public static AuthDto convert(User user, String token) {
         AuthDto authDto = new AuthDto();
-        authDto.setFullname(fullname);
         authDto.setJwt(token);
+        authDto.setFullname(user.getFullname());
+        authDto.setAvatar(user.getAvatar());
         return authDto;
     }
 }
