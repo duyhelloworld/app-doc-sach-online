@@ -10,11 +10,14 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import huce.edu.vn.appdocsach.dto.auth.AuthDto;
+import huce.edu.vn.appdocsach.dto.auth.ChangePasswordDto;
 import huce.edu.vn.appdocsach.dto.auth.SigninDto;
 import huce.edu.vn.appdocsach.dto.auth.SignupDto;
+import huce.edu.vn.appdocsach.dto.auth.UpdateProfileDto;
 import huce.edu.vn.appdocsach.entities.Role;
 import huce.edu.vn.appdocsach.entities.TokenProvider;
 import huce.edu.vn.appdocsach.entities.User;
@@ -60,8 +63,8 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
     }
 
     @Override
-    public void signOut(AuthUser authUser, HttpServletRequest request) {
-        logger.onStart(Thread.currentThread(), authUser);
+    public void signOut(User user, HttpServletRequest request) {
+        logger.onStart(Thread.currentThread(), user.getUsername());
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
@@ -98,7 +101,7 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
         user.setUsername(username);
         user.setAvatar(avatarUrl);
         user.setEmail(signupDto.getEmail());
-        user.setFullname(signupDto.getFullName());
+        user.setFullname(signupDto.getFullname());
         user.setPassword(passwordEncoder.encode(signupDto.getPassword()));
         user.setProvider(TokenProvider.LOCAL);
         user.setRole(Role.USER);
@@ -152,5 +155,32 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
         } catch (Exception e) {
             throw new AppException(ResponseCode.UNAUTHORIZED);
         }
+    }
+
+    @Override
+    public void changePassword(User user, ChangePasswordDto changePasswordDto) {
+        if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
+            throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+        userRepo.save(user);
+    }
+
+    @Override
+    public void updateProfile(User user, UpdateProfileDto updateProfileDto, MultipartFile avatar) {
+        logger.onStart(Thread.currentThread(), user.getUsername(), updateProfileDto);
+        if (avatar != null && !avatar.isEmpty()) {
+            logger.onStart(Thread.currentThread(), "avatar", avatar.getOriginalFilename());
+            cloudinaryService.deleteOne(user.getAvatar());
+            String newAvtName = cloudinaryService.save(avatar);
+            user.setAvatar(newAvtName);
+        }
+        if (StringUtils.hasText(updateProfileDto.getEmail())) {
+            user.setEmail(updateProfileDto.getEmail());
+        }
+        if (StringUtils.hasText(updateProfileDto.getFullname())) {
+            user.setFullname(updateProfileDto.getFullname());
+        }
+        userRepo.save(user);
     }
 }

@@ -18,24 +18,24 @@ public enum ResponseCode {
     USERNAME_NOT_FOUND(1003, "Không tồn tại tài khoản", HttpStatus.UNAUTHORIZED),
     USERNAME_EXISTED(1004, "Tên tài khoản đã tồn tại", HttpStatus.CONFLICT),
     USERNAME_OR_PASSWORD_INCORRECT(1005, "Sai tài khoản hoặc mật khẩu", HttpStatus.UNAUTHORIZED),
-    
+    OLD_PASSWORD_NOT_MATCH(1006, "Mật khẩu không chính xác", HttpStatus.UNAUTHORIZED),
+
     // @Valid User
-    USERNAME_MISSING(1006, "Không được bỏ trống tên tài khoản", HttpStatus.BAD_REQUEST),
-    USERNAME_INVALID(1007, "Tên tài khoản không hợp lệ. Tên tài khoản hợp lệ gồm các chữ cái (A-Z, a-z) và số (0-9)", HttpStatus.BAD_REQUEST),
-    PASSWORD_MISSING(1008, "Không được bỏ trống mật khẩu", HttpStatus.BAD_REQUEST),
-    EMAIL_MISSING(1009, "Không được bỏ trống email", HttpStatus.BAD_REQUEST),
-    EMAIL_INVALID(1010, "Email không hợp lệ. Hãy sử dụng địa chỉ email hợp lệ để đăng kí", HttpStatus.BAD_REQUEST),
-    PASSWORD_INVALID(1011, "Mật khẩu không hợp lệ. Hãy đặt mật khẩu dài hơn 8 kí tự", HttpStatus.BAD_REQUEST),
+    USERNAME_MISSING(1007, "Không được bỏ trống tên tài khoản", HttpStatus.BAD_REQUEST),
+    USERNAME_INVALID(1008, "Tên tài khoản không hợp lệ. Tên tài khoản hợp lệ gồm các chữ cái (A-Z, a-z) và số (0-9)", HttpStatus.BAD_REQUEST),
+    PASSWORD_MISSING(1009, "Không được bỏ trống mật khẩu", HttpStatus.BAD_REQUEST),
+    EMAIL_MISSING(1010, "Không được bỏ trống email", HttpStatus.BAD_REQUEST),
+    EMAIL_INVALID(1011, "Email không hợp lệ. Hãy sử dụng địa chỉ email hợp lệ để đăng kí", HttpStatus.BAD_REQUEST),
+    PASSWORD_INVALID(1012, "Mật khẩu không hợp lệ. Hãy đặt mật khẩu dài hơn 8 kí tự", HttpStatus.BAD_REQUEST),
     
     // File working
-    FILE_CONTENT_INVALID(1009, "Nội dung file không hợp lệ", HttpStatus.BAD_REQUEST),
-    FILE_TYPE_INVALID(1010, "Tên file/loại file này không được hỗ trợ. Các loại file hỗ trợ là "
+    FILE_CONTENT_INVALID(1013, "Nội dung file không hợp lệ", HttpStatus.BAD_REQUEST),
+    FILE_TYPE_INVALID(1014, "Tên file/loại file này không được hỗ trợ. Các loại file hỗ trợ là "
         .formatted(AppConst.VALID_IMAGE_EXTENSIONS), HttpStatus.EXPECTATION_FAILED),
-    FILE_CONTENT_MISSING(2014, "Thiếu file gửi lên", HttpStatus.NOT_FOUND),
-
+    FILE_CONTENT_MISSING(1015, "Thiếu file gửi lên", HttpStatus.NOT_FOUND),
 
     // Bussiness Logic Code
-    INVALID_KEY(1011, "Lỗi khi kiểm tra dữ liệu hợp lệ", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_KEY(1016, "Lỗi khi kiểm tra dữ liệu hợp lệ", HttpStatus.INTERNAL_SERVER_ERROR),
     
     CATEGORY_NOT_FOUND(2000, "Không thấy thể loại này", HttpStatus.NOT_FOUND),
     CATEGORY_NAME_EXISTED(2001, "Tên tiêu đề đã tồn tại", HttpStatus.CONFLICT),

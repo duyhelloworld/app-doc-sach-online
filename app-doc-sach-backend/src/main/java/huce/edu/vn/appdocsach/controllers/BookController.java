@@ -25,7 +25,6 @@ import huce.edu.vn.appdocsach.services.abstracts.core.IRateService;
 import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
 import huce.edu.vn.appdocsach.utils.Mapper;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -77,7 +76,7 @@ public class BookController {
     @PutMapping("rate")
     public void rateBook(@AuthenticationPrincipal AuthUser authUser, 
         @RequestParam Integer bookId,
-        @RequestBody @Valid CreateRateDto createRateDto) {
+        @RequestBody CreateRateDto createRateDto) {
             rateService.toggerRate(authUser.getUser(), createRateDto, bookId);
     }
 }

@@ -184,4 +184,19 @@ public class CloudinaryService implements ICloudinaryService {
         }
         return null;
     }
+
+    @Override
+    public void deleteOne(String url) {
+        String fileName = extractFilenameFromUrl(url);
+        try {
+            map.clear();
+            cloudinary.uploader().destroy(fileName, map);
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
+
+    private String extractFilenameFromUrl(String url) {
+        return url.substring(61);
+    }
 }

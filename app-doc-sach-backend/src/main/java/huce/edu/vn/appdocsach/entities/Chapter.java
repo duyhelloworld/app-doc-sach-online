@@ -1,7 +1,6 @@
 package huce.edu.vn.appdocsach.entities;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -50,7 +49,4 @@ public class Chapter {
     @JsonIgnore
     @OneToMany(mappedBy = "chapter")
     private List<Comment> comments;
-
-    @JsonIgnore
-    private List<History> histories = new ArrayList<>();
 }

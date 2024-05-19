@@ -18,4 +18,5 @@ public interface ICloudinaryService {
     
     void delete(String folderName);
 
+    void deleteOne(String url);
 }
