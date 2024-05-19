@@ -7,7 +7,9 @@ import huce.edu.vn.appdocsach.dto.auth.ChangePasswordDto;
 import huce.edu.vn.appdocsach.dto.auth.SigninDto;
 import huce.edu.vn.appdocsach.dto.auth.SignupDto;
 import huce.edu.vn.appdocsach.dto.auth.UpdateProfileDto;
+import huce.edu.vn.appdocsach.dto.auth.UserInfoDto;
 import huce.edu.vn.appdocsach.entities.User;
+import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface IAuthService {
@@ -21,4 +23,6 @@ public interface IAuthService {
     void changePassword(User user, ChangePasswordDto changePasswordDto);
 
     void updateProfile(User user, UpdateProfileDto updateProfileDto, MultipartFile avatar);
+
+    UserInfoDto getUserInfo(AuthUser authUser);
 }

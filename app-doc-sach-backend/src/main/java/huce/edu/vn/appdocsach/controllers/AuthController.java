@@ -2,6 +2,7 @@ package huce.edu.vn.appdocsach.controllers;
 
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import huce.edu.vn.appdocsach.dto.auth.ChangePasswordDto;
 import huce.edu.vn.appdocsach.dto.auth.SigninDto;
 import huce.edu.vn.appdocsach.dto.auth.SignupDto;
 import huce.edu.vn.appdocsach.dto.auth.UpdateProfileDto;
+import huce.edu.vn.appdocsach.dto.auth.UserInfoDto;
 import huce.edu.vn.appdocsach.services.abstracts.auth.IAuthService;
 import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
 import huce.edu.vn.appdocsach.utils.Mapper;
@@ -37,6 +39,13 @@ public class AuthController {
     IAuthService authService;
 
     Mapper mapper; 
+
+    @Operation(summary = "Lấy thông tin user")
+    @GetMapping
+    @IsAuthenticated
+    public UserInfoDto getInfo(@AuthenticationPrincipal AuthUser authUser) {
+        return authService.getUserInfo(authUser);
+    }
 
     @Operation(summary = "Đăng kí 1 tài khoản với ảnh avatar cung cấp")
     @PostMapping(path = "signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

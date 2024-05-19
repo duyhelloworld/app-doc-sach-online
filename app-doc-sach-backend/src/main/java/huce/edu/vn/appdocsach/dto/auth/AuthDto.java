@@ -1,10 +1,10 @@
 package huce.edu.vn.appdocsach.dto.auth;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@Data
+@AllArgsConstructor
+@Getter
 public class AuthDto {
     private String jwt;
-    private String fullname;
-    private String avatar;
 }

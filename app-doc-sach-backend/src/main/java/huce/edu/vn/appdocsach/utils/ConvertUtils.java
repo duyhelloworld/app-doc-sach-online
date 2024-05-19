@@ -2,7 +2,7 @@ package huce.edu.vn.appdocsach.utils;
 
 import java.util.Optional;
 
-import huce.edu.vn.appdocsach.dto.auth.AuthDto;
+import huce.edu.vn.appdocsach.dto.auth.UserInfoDto;
 import huce.edu.vn.appdocsach.dto.core.book.BookDto;
 import huce.edu.vn.appdocsach.dto.core.book.SimpleBookDto;
 import huce.edu.vn.appdocsach.dto.core.category.CategoryDto;
@@ -14,7 +14,7 @@ import huce.edu.vn.appdocsach.entities.Category;
 import huce.edu.vn.appdocsach.entities.Chapter;
 import huce.edu.vn.appdocsach.entities.Comment;
 import huce.edu.vn.appdocsach.entities.Rating;
-import huce.edu.vn.appdocsach.entities.User;
+import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
 
 public class ConvertUtils {
     
@@ -79,11 +79,11 @@ public class ConvertUtils {
                 .build();
     }
 
-    public static AuthDto convert(User user, String token) {
-        AuthDto authDto = new AuthDto();
-        authDto.setJwt(token);
-        authDto.setFullname(user.getFullname());
-        authDto.setAvatar(user.getAvatar());
-        return authDto;
+    public static UserInfoDto convert(AuthUser authUser) {
+        return UserInfoDto.builder()
+            .avatar(authUser.getAvatar())
+            .fullname(authUser.getFullname())
+            .username(authUser.getUsername())
+            .build();
     }
 }

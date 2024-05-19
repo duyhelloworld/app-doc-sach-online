@@ -18,6 +18,7 @@ import huce.edu.vn.appdocsach.dto.auth.ChangePasswordDto;
 import huce.edu.vn.appdocsach.dto.auth.SigninDto;
 import huce.edu.vn.appdocsach.dto.auth.SignupDto;
 import huce.edu.vn.appdocsach.dto.auth.UpdateProfileDto;
+import huce.edu.vn.appdocsach.dto.auth.UserInfoDto;
 import huce.edu.vn.appdocsach.entities.Role;
 import huce.edu.vn.appdocsach.entities.TokenProvider;
 import huce.edu.vn.appdocsach.entities.User;
@@ -77,7 +78,7 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
             throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
         }
         if (passwordEncoder.matches(signinDto.getPassword(), user.getPassword())) {
-            return ConvertUtils.convert(user, jwtService.buildToken(user));
+            return new AuthDto(jwtService.buildToken(user));
         }
         throw new AppException(ResponseCode.USERNAME_OR_PASSWORD_INCORRECT);
     }
@@ -106,7 +107,7 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
         user.setProvider(TokenProvider.LOCAL);
         user.setRole(Role.USER);
         userRepo.save(user);
-        return ConvertUtils.convert(user, jwtService.buildToken(user));
+        return new AuthDto(jwtService.buildToken(user));
     }
 
     @Override
@@ -182,5 +183,10 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
             user.setFullname(updateProfileDto.getFullname());
         }
         userRepo.save(user);
+    }
+
+    @Override
+    public UserInfoDto getUserInfo(AuthUser authUser) {
+        return ConvertUtils.convert(authUser);
     }
 }
