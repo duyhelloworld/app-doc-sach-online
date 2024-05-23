@@ -5,6 +5,10 @@ spring:
     url: jdbc:mysql://localhost:3306/appdocsach?createDatabaseIfNotExist=true&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true
     username: appdocsach
     password: password
+  data:
+    redis:
+      host: localhost
+      port: 6379
   jpa:
     open-in-view: false
     show-sql: false

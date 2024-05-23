@@ -31,4 +31,13 @@ public class Mapper {
             throw new AppException(ResponseCode.UNEXPECTED_ERROR);
         }
     }
+
+    public <T> String write(Class<T> input) {
+        try {
+            return objectMapper.writeValueAsString(input);
+        } catch (JsonProcessingException e) {
+            logger.error(e.getLocation().toString());
+            throw new AppException(ResponseCode.UNEXPECTED_ERROR);
+        }
+    }
 }

@@ -41,7 +41,7 @@ public class AuthController {
     Mapper mapper; 
 
     @Operation(summary = "Lấy thông tin user")
-    @GetMapping
+    @GetMapping("info")
     @IsAuthenticated
     public UserInfoDto getInfo(@AuthenticationPrincipal AuthUser authUser) {
         return authService.getUserInfo(authUser);

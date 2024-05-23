@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import huce.edu.vn.appdocsach.annotations.auth.IsAdmin;
 import huce.edu.vn.appdocsach.annotations.auth.IsUser;
+import huce.edu.vn.appdocsach.cachings.IBookRedisService;
 import huce.edu.vn.appdocsach.dto.core.book.BookDto;
 import huce.edu.vn.appdocsach.dto.core.book.CreateBookDto;
 import huce.edu.vn.appdocsach.dto.core.book.FindBookDto;
@@ -43,12 +44,19 @@ public class BookController {
 
     IBookService bookService;
 
+    IBookRedisService bookRedisService;
+
     IRateService rateService;
 
     @Operation(summary = "Lấy tất cả sách cho trang home + Tìm kiếm theo thể loại & từ khóa")
     @GetMapping("all")
     public PagingResponse<SimpleBookDto> getAllBook(FindBookDto findBookDto) {
-        return bookService.getAllBookSimple(findBookDto);
+        PagingResponse<SimpleBookDto> response = bookRedisService.getAllBookSimple(findBookDto);
+        if (response == null) {
+            response = bookService.getAllBookSimple(findBookDto);
+            bookRedisService.save(response, findBookDto);
+        }
+        return response;
     }
 
     @Operation(summary = "Lấy sách theo id, dùng cho trang hiển thị thông tin tin cụ thể của sách")

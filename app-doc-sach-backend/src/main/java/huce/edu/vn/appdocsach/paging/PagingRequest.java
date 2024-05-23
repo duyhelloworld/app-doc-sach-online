@@ -10,6 +10,9 @@ public class PagingRequest {
     private Integer pageNumber;
 
     public Integer getPageSize() {
+        if (pageSize == null) {
+            return AppConst.DEFAULT_PAGE_SIZE;
+        }
         if (pageSize > AppConst.MAX_PAGE_SIZE) {
             pageSize = AppConst.MAX_PAGE_SIZE;
         } else if (pageSize < AppConst.MIN_PAGE_SIZE) {
@@ -19,6 +22,6 @@ public class PagingRequest {
     }
 
     public Integer getPageNumber() {
-        return this.pageNumber < 1 ? AppConst.DEFAULT_PAGE_NUMBER : this.pageNumber;
+        return pageNumber == null || pageNumber < 1 ? AppConst.DEFAULT_PAGE_NUMBER : this.pageNumber;
     }
 }

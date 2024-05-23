@@ -20,9 +20,7 @@ public class AppExcpHandler {
 
     @ExceptionHandler({ Exception.class })
     ResponseEntity<ErrorResponse> handleAppException(Exception ex) {
-        
-        logger.error(ex.getMessage());
-
+        logger.error(ex);
         // Custom Exception đã định nghĩa
         if (ex instanceof AppException appEx) {
             return writeResponse(appEx.getResponseCode());
@@ -54,7 +52,6 @@ public class AppExcpHandler {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(response);
         }
-
         return writeResponse(ResponseCode.UNEXPECTED_ERROR);
     }
 
