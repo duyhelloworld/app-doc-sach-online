@@ -15,7 +15,7 @@ public interface ICommentService {
 
     CommentDto getCommentById(Integer id);
 
-    Integer writeComment(User user, CreateCommentDto createCommentDto);
+    CommentDto writeComment(User user, CreateCommentDto createCommentDto);
 
     CommentDto updateComment(User user, UpdateCommentDto updateCommentDto);
 

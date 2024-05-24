@@ -21,7 +21,7 @@ public class AppExcpHandler {
     @ExceptionHandler({ Exception.class })
     ResponseEntity<ErrorResponse> handleAppException(Exception ex) {
         
-        logger.error(ex.getMessage());
+        logger.error(ex);
 
         // Custom Exception đã định nghĩa
         if (ex instanceof AppException appEx) {

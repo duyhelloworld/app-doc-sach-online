@@ -69,7 +69,7 @@ public class CommentService implements ICommentService {
 
     @Override
     @Transactional
-    public Integer writeComment(User user, CreateCommentDto createCommentDto) {
+    public CommentDto writeComment(User user, CreateCommentDto createCommentDto) {
         logger.onStart(Thread.currentThread(), user.getUsername(), createCommentDto);
         int chapterId = createCommentDto.getChapterId();
         Chapter chapter = chapterRepo.findById(chapterId)
@@ -80,7 +80,7 @@ public class CommentService implements ICommentService {
         comment.setCreatedAt(LocalDateTime.now());
         comment.setChapter(chapter);
         commentRepo.save(comment);
-        return comment.getId();
+        return ConvertUtils.convert(comment);
     }
 
     @Override

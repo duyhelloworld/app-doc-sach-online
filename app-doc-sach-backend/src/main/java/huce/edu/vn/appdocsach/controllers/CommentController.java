@@ -47,7 +47,7 @@ public class CommentController {
     @Operation(summary = "Viết 1 comment")
     @IsUser
     @PostMapping
-    public Integer writeNewComment(
+    public CommentDto writeNewComment(
         @AuthenticationPrincipal AuthUser authUser,   
         @RequestBody CreateCommentDto createCommentDto) {
         return commentService.writeComment(authUser.getUser(), createCommentDto);
