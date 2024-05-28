@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import huce.edu.vn.appdocsach.constants.AvatarSaver;
 import huce.edu.vn.appdocsach.dto.auth.AuthDto;
 import huce.edu.vn.appdocsach.dto.auth.ChangePasswordDto;
 import huce.edu.vn.appdocsach.dto.auth.SigninDto;
@@ -87,14 +88,17 @@ public class AuthService extends DefaultOAuth2UserService implements IAuthServic
     @Transactional
     public AuthDto signUp(@Valid SignupDto signupDto, MultipartFile avatar) {
         String username = signupDto.getUsername();
+        String avatarUrl;
         if (avatar == null) {
-            throw new AppException(ResponseCode.FILE_CONTENT_MISSING);
-        } 
-        if (!cloudinaryService.isValidFileName(avatar)) {
-            throw new AppException(ResponseCode.FILE_TYPE_INVALID);
+            avatarUrl = AvatarSaver.getAvatarUrl();
+            logger.onStart(Thread.currentThread(), username, "Avatar = DEFAULT");
+        } else {
+            logger.onStart(Thread.currentThread(), username, "Avatar = ", avatar.getOriginalFilename());
+            if (!cloudinaryService.isValidFileName(avatar)) {
+                throw new AppException(ResponseCode.FILE_TYPE_INVALID);
+            }
+            avatarUrl = cloudinaryService.save(avatar);
         }
-        logger.onStart(Thread.currentThread(), username, "Avatar = ", avatar.getOriginalFilename());
-        String avatarUrl = cloudinaryService.save(avatar);
         if (userRepo.existsByUsername(username)) {
             throw new AppException(ResponseCode.USERNAME_EXISTED);
         }

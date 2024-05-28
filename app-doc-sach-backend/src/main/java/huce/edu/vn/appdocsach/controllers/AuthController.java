@@ -41,7 +41,7 @@ public class AuthController {
     Mapper mapper; 
 
     @Operation(summary = "Lấy thông tin user")
-    @GetMapping
+    @GetMapping("info")
     @IsAuthenticated
     public UserInfoDto getInfo(@AuthenticationPrincipal AuthUser authUser) {
         return authService.getUserInfo(authUser);
@@ -52,7 +52,7 @@ public class AuthController {
     public AuthDto signUp(
         @Parameter(description = "{ \"fullName\":\"\", \"username\": \"\", \"password\": \"\", \"email\":\"\"}")
             @RequestPart String jsonModel,
-            @RequestPart MultipartFile avatar) {
+            @RequestPart(required = false) MultipartFile avatar) {
         SignupDto signupDto = mapper.getInstance(jsonModel,  SignupDto.class);
         return authService.signUp(signupDto, avatar);
     }

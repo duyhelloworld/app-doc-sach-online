@@ -53,6 +53,7 @@ public class ChapterService implements IChapterService {
         logger.onStart(Thread.currentThread(), id);
         Chapter chapter = chapterRepo.findById(id)
                 .orElseThrow(() -> new AppException(ResponseCode.CHAPTER_NOT_FOUND));
+        chapter.getBook().incViewCount();
         return cloudinaryService.getUrls(chapter.getFolderName());
     }
 
@@ -66,7 +67,11 @@ public class ChapterService implements IChapterService {
     public PagingResponse<SimpleChapterDto> getAllChapterSimple(FindChapterDto findChapterDto) {
         logger.onStart(Thread.currentThread(), findChapterDto);
         PageRequest pageRequest = PagingHelper.pageRequest(Chapter.class, findChapterDto);
-        Page<Chapter> chapters = chapterRepo.findByBookId(findChapterDto.getBookId(), pageRequest);
+        Book book = bookRepo.findById(findChapterDto.getBookId())
+            .orElseThrow(() -> new AppException(ResponseCode.BOOK_NOT_FOUND));
+        book.incViewCount();
+        Page<Chapter> chapters = chapterRepo.findByBook(book, pageRequest);
+        bookRepo.save(book);
         PagingResponse<SimpleChapterDto> response = new PagingResponse<>();
         response.setTotalPage(chapters.getTotalPages());
         response.setValues(chapters.map(c -> ConvertUtils.convert(c)).getContent());

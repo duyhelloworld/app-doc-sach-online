@@ -36,7 +36,7 @@ public class ChapterController {
 
     Mapper mapper;
 
-    @Operation(summary = "Lấy thông tin các chapter gần đây")
+    @Operation(summary = "Lấy thông tin các chapter")
     @GetMapping
     public PagingResponse<SimpleChapterDto> getChapterSimple(FindChapterDto findChapterDto) {
         return chapterService.getAllChapterSimple(findChapterDto);

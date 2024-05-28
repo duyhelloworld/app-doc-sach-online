@@ -22,6 +22,8 @@ public class BookDto {
 
     private String coverImage;
 
+    private Long viewCount;
+
     private String description;
 
     private String author;

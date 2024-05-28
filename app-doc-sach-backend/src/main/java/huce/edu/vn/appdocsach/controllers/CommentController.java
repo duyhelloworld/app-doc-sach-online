@@ -46,7 +46,7 @@ public class CommentController {
 
     @Operation(summary = "Viết 1 comment")
     @IsUser
-    @PostMapping
+    @PostMapping("add")
     public CommentDto writeNewComment(
         @AuthenticationPrincipal AuthUser authUser,   
         @RequestBody CreateCommentDto createCommentDto) {
@@ -55,7 +55,7 @@ public class CommentController {
 
     @Operation(summary = "Sửa 1 comment")
     @IsUser
-    @PutMapping
+    @PutMapping("edit")
     public CommentDto updateComment(
     @AuthenticationPrincipal AuthUser authUser,    
     @RequestBody UpdateCommentDto updateCommentDto) {

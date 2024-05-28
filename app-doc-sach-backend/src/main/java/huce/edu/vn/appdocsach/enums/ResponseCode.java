@@ -34,9 +34,9 @@ public enum ResponseCode {
         .formatted(AppConst.VALID_IMAGE_EXTENSIONS), HttpStatus.EXPECTATION_FAILED),
     FILE_CONTENT_MISSING(1015, "Thiếu file gửi lên", HttpStatus.NOT_FOUND),
 
-    // Bussiness Logic Code
     INVALID_KEY(1016, "Lỗi khi kiểm tra dữ liệu hợp lệ", HttpStatus.INTERNAL_SERVER_ERROR),
-    
+    INVALID_SORT_BY(1017, "Lỗi khi xử lí sắp xếp dữ liệu", HttpStatus.BAD_REQUEST),
+    // Bussiness Logic Code
     CATEGORY_NOT_FOUND(2000, "Không thấy thể loại này", HttpStatus.NOT_FOUND),
     CATEGORY_NAME_EXISTED(2001, "Tên tiêu đề đã tồn tại", HttpStatus.CONFLICT),
 

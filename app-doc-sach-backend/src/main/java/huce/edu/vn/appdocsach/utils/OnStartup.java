@@ -1,10 +1,8 @@
 package huce.edu.vn.appdocsach.utils;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +17,7 @@ import huce.edu.vn.appdocsach.services.abstracts.core.IBookService;
 import huce.edu.vn.appdocsach.services.abstracts.core.IChapterService;
 import huce.edu.vn.appdocsach.services.abstracts.core.ICommentService;
 import huce.edu.vn.appdocsach.services.abstracts.file.ICloudinaryService;
+import huce.edu.vn.appdocsach.services.abstracts.file.IResourceService;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
@@ -40,11 +39,13 @@ public class OnStartup implements CommandLineRunner {
 
 	PasswordEncoder passwordEncoder;
 
+	IResourceService resourceService;
+
 	AppLogger<OnStartup> logger;
 
 	public OnStartup(UserRepo userRepo, CategoryRepo categoryRepo, IBookService bookService,
 			IChapterService chapterService, ICommentService commentService,
-			PasswordEncoder passwordEncoder, ICloudinaryService cloudinaryService) {
+			PasswordEncoder passwordEncoder, ICloudinaryService cloudinaryService, IResourceService resourceService) {
 		this.userRepo = userRepo;
 		this.categoryRepo = categoryRepo;
 		this.bookService = bookService;
@@ -52,6 +53,7 @@ public class OnStartup implements CommandLineRunner {
 		this.commentService = commentService;
 		this.passwordEncoder = passwordEncoder;
 		this.cloudinaryService = cloudinaryService;
+		this.resourceService = resourceService;
 		this.logger = new AppLogger<>(OnStartup.class);
 	}
 
@@ -114,7 +116,7 @@ public class OnStartup implements CommandLineRunner {
 					.build();
 			String fileName1 = "grand-blue.jpg";
 			int bookId1 = bookService.addBook(bookDto1,
-					getStaticFiles(fileName1),
+					resourceService.readStatic(fileName1),
 					fileName1);
 			logger.info("Added book {} : ", bookId1, bookDto1.getTitle(), fileName1);
 
@@ -127,7 +129,7 @@ public class OnStartup implements CommandLineRunner {
 					.build();
 			String fileName2 = "sousou-no-frieren.jpg";
 			int bookId = bookService.addBook(bookDto2,
-					getStaticFiles(fileName2),
+					resourceService.readStatic(fileName2),
 					fileName2);
 			logger.info("Added book {} : ", bookId, bookDto1.getTitle(), fileName2);
 		}
@@ -143,8 +145,8 @@ public class OnStartup implements CommandLineRunner {
 		// Init test user
 		if (userRepo.count() == 0) {
 			// Save avatar
-			String defaultAvatarUrl = cloudinaryService.save(getStaticFiles("default-avatar.png"), "default-avatar.png");
-			
+			String defaultAvatarFileName = "default-avatar.png";
+			String defaultAvatarUrl = cloudinaryService.save(resourceService.readStatic(defaultAvatarFileName), defaultAvatarFileName);
 			String defaultPass = passwordEncoder.encode("12345678");
 			
 			User u1 = new User("admin", "Adminitrastor", "admin@gmail.com", defaultAvatarUrl,
@@ -156,15 +158,6 @@ public class OnStartup implements CommandLineRunner {
 			userRepo.saveAll(List.of(u1, u2, u3));
 			logger.info("Saved user account : {}, {}", u2.getUsername(), u3.getUsername());
 			logger.info("Saved admin account : {}", u1.getUsername());
-		}
-	}
-
-	private byte[] getStaticFiles(String fileName) {
-		try {
-			return new ClassPathResource("static/" + fileName).getContentAsByteArray();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
 		}
 	}
 }

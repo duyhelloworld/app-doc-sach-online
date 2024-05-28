@@ -14,17 +14,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import huce.edu.vn.appdocsach.annotations.auth.IsAdmin;
 import huce.edu.vn.appdocsach.annotations.auth.IsUser;
+import huce.edu.vn.appdocsach.constants.AppConst;
 import huce.edu.vn.appdocsach.dto.core.book.BookDto;
 import huce.edu.vn.appdocsach.dto.core.book.CreateBookDto;
-import huce.edu.vn.appdocsach.dto.core.book.FindBookDto;
 import huce.edu.vn.appdocsach.dto.core.book.SimpleBookDto;
 import huce.edu.vn.appdocsach.dto.core.rate.CreateRateDto;
+import huce.edu.vn.appdocsach.paging.PagingRequest;
 import huce.edu.vn.appdocsach.paging.PagingResponse;
 import huce.edu.vn.appdocsach.services.abstracts.core.IBookService;
 import huce.edu.vn.appdocsach.services.abstracts.core.IRateService;
 import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
 import huce.edu.vn.appdocsach.utils.Mapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -47,8 +49,13 @@ public class BookController {
 
     @Operation(summary = "Lấy tất cả sách cho trang home + Tìm kiếm theo thể loại & từ khóa")
     @GetMapping("all")
-    public PagingResponse<SimpleBookDto> getAllBook(FindBookDto findBookDto) {
-        return bookService.getAllBookSimple(findBookDto);
+    public PagingResponse<SimpleBookDto> getAllBook(
+        @RequestParam(defaultValue = "1") int pageSize, 
+        @RequestParam(defaultValue = "1") int pageNumber,
+        @RequestParam(defaultValue = "0") int categoryId,
+        @RequestParam(required = false) String keyword,
+        @RequestParam(defaultValue = AppConst.DEFAULT_SORT_BY) String sort) {
+        return bookService.getAllBook(PagingRequest.of(pageSize, pageNumber), categoryId, sort, keyword);
     }
 
     @Operation(summary = "Lấy sách theo id, dùng cho trang hiển thị thông tin tin cụ thể của sách")
@@ -61,6 +68,7 @@ public class BookController {
     @IsAdmin
     @PostMapping(path = "with-cover", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Integer addNewWithImage(@AuthenticationPrincipal AuthUser authUser,
+	    @Parameter(description = "{\"title\": \"\", \"author\": \"\", \"description\": \"\", \"categoryIds\": [1, 2, 3, 4, 5] }")
             @RequestPart String jsonCreateBookDto,
             @RequestPart(required = true) MultipartFile coverImage) {
         try {

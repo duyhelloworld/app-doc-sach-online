@@ -50,6 +50,13 @@ public class Book {
     @Column(columnDefinition = "text")
     private String description;
 
+    @Column(nullable = false)
+    private Long viewCount;
+
+    public void incViewCount() {
+        this.viewCount++;
+    }
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(name = "books_categories", 

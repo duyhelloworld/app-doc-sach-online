@@ -23,8 +23,6 @@ public class ConvertUtils {
                 .id(book.getId())
                 .coverImage(book.getCoverImage())
                 .title(book.getTitle())
-                .author(book.getAuthor())
-                .lastUpdatedAt(book.getUpdatedAt() == null ? book.getCreatedAt() : book.getUpdatedAt())
                 .build();
     }
 
@@ -35,8 +33,8 @@ public class ConvertUtils {
                 .author(book.getAuthor())
                 .coverImage(book.getCoverImage())
                 .description(book.getDescription())
-                .lastUpdatedAt(Optional.ofNullable(book.getUpdatedAt()).orElse(book.getCreatedAt()))
-                .categories(book.getCategories().stream().map(c -> convertSimple(c)).toList())
+                .lastUpdatedAt(Optional.ofNullable(book.getUpdatedAt())
+                    .orElse(book.getCreatedAt()))
                 .chapters(book.getChapters().stream().map(ch -> convert(ch)).toList())
                 .averageRate(book.getRatings().stream()
                         .mapToDouble(Rating::getStar)
