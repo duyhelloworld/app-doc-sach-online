@@ -1,6 +1,7 @@
 package huce.edu.vn.appdocsach.utils;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import huce.edu.vn.appdocsach.dto.auth.UserInfoDto;
 import huce.edu.vn.appdocsach.dto.core.book.BookDto;
@@ -35,11 +36,13 @@ public class ConvertUtils {
                 .description(book.getDescription())
                 .lastUpdatedAt(Optional.ofNullable(book.getUpdatedAt())
                     .orElse(book.getCreatedAt()))
+                .categories(book.getCategories().stream().map(c -> c.getName()).collect(Collectors.joining(", ")))
                 .chapters(book.getChapters().stream().map(ch -> convert(ch)).toList())
                 .averageRate(book.getRatings().stream()
                         .mapToDouble(Rating::getStar)
                         .average()
                         .orElse(0.0))
+                .viewCount(book.getViewCount())
                 .build();
     }
 
