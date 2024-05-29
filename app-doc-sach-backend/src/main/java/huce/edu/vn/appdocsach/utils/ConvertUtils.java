@@ -85,6 +85,7 @@ public class ConvertUtils {
             .avatar(authUser.getAvatar())
             .fullname(authUser.getFullname())
             .username(authUser.getUsername())
+            .email(authUser.getEmail())
             .build();
     }
 }

@@ -9,4 +9,5 @@ public class UserInfoDto {
     private String fullname;
     private String avatar;
     private String username;
+    private String email;
 }
