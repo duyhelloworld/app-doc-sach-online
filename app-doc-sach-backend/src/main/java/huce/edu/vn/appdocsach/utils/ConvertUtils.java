@@ -83,9 +83,9 @@ public class ConvertUtils {
     public static UserInfoDto convert(AuthUser authUser) {
         return UserInfoDto.builder()
             .avatar(authUser.getAvatar())
+	    .email(authUser.getEmail())
             .fullname(authUser.getFullname())
             .username(authUser.getUsername())
-            .email(authUser.getEmail())
             .build();
     }
 }

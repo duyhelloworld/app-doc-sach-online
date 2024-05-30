@@ -54,10 +54,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Rating> ratings = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "user")
-    private List<History> histories = new ArrayList<>();
-
     @Override
     public boolean equals(Object object) {
         User user = (User) object;

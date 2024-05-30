@@ -71,8 +71,4 @@ public class Book {
     @JsonIgnore
     @OneToMany(mappedBy = "book")
     private List<Rating> ratings = new ArrayList<>();
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "book")
-    private List<History> histories = new ArrayList<>();
 }
