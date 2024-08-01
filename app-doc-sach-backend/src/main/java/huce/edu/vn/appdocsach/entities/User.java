@@ -1,9 +1,6 @@
 package huce.edu.vn.appdocsach.entities;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +17,7 @@ import lombok.Setter;
 @Getter
 @Entity
 public class User {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -27,7 +25,7 @@ public class User {
     @Column(length = 100, nullable = false, unique = true)
     private String username;
 
-    @Column(length = 150)
+    @Column(length = 200)
     private String fullname;
 
     @Column(length = 100)
@@ -46,23 +44,12 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "user")
-    private List<Comment> comments = new ArrayList<>();
+    private Boolean isEnabled = true;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "user")
-    private List<Rating> ratings = new ArrayList<>();
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "user")
-    private List<History> histories = new ArrayList<>();
-
-    @Override
-    public boolean equals(Object object) {
-        User user = (User) object;
-        return this.id == user.id && this.username.equals(user.username);
-    }
+    private LocalDateTime willEnableAt;
+    
+    @OneToOne(mappedBy = "user")
+    private RefreshToken refreshToken;
 
     public User() {}
 
@@ -76,19 +63,10 @@ public class User {
         this.role = role;
     }
 
-
     @Override
-    public String toString() {
-        return "{" +
-            " id='" + getId() + "'" +
-            ", username='" + getUsername() + "'" +
-            ", fullname='" + getFullname() + "'" +
-            ", email='" + getEmail() + "'" +
-            ", avatar='" + getAvatar() + "'" +
-            ", provider='" + getProvider() + "'" +
-            ", role='" + getRole() + "'" +
-            "}";
+    public boolean equals(Object object) {
+        User user = (User) object;
+        return this.id == user.id 
+            && this.username.equals(user.username);
     }
-
-
 }
