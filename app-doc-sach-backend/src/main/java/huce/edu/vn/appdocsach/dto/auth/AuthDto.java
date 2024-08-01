@@ -1,10 +1,15 @@
 package huce.edu.vn.appdocsach.dto.auth;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 
-@AllArgsConstructor
-@Getter
+@Data
+@Builder
 public class AuthDto {
-    private String jwt;
+
+    private String accessToken;
+
+    private String refreshToken;
+
+    private UserInfoDto userInfo;
 }

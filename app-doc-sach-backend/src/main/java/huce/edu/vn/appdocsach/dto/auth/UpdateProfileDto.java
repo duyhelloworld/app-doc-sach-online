@@ -1,8 +1,7 @@
 package huce.edu.vn.appdocsach.dto.auth;
 
-import huce.edu.vn.appdocsach.constants.AppConst;
+import huce.edu.vn.appdocsach.annotations.valid.ValidEmail;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
@@ -11,6 +10,6 @@ public class UpdateProfileDto {
 
     private String fullname;
     
-    @Pattern(regexp = AppConst.REGEX_CHECK_EMAIL, message = "EMAIL_INVALID")
+    @ValidEmail(nullable = true)
     private String email;
 }
