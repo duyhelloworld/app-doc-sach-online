@@ -1,13 +1,13 @@
 package huce.edu.vn.appdocsach.utils;
 
-import huce.edu.vn.appdocsach.constants.AppConst;
+import huce.edu.vn.appdocsach.constants.PagingConstants;
 import huce.edu.vn.appdocsach.dto.core.chapter.CreateChapterDto;
 
 public class NamingUtil {
     public static String normalizeFolderName(CreateChapterDto createChapterDto) {
         StringBuilder builder = new StringBuilder();
         builder.append(createChapterDto.getBookId())
-                .append(AppConst.DELIMITER_IN_CHAPTER_FOLDER_NAME)
+                .append(PagingConstants.DELIMITER_IN_CHAPTER_FOLDER_NAME)
                 .append(createChapterDto.getTitle()
                     .replace(" ", "")
                     .toLowerCase());
