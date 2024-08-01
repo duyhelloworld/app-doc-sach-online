@@ -2,7 +2,7 @@ package huce.edu.vn.appdocsach.constants;
 
 import java.util.List;
 
-public class AppConst {
+public class PagingConstants {
     
     public static final Integer DEFAULT_PAGE_SIZE = 1;
 
@@ -20,7 +20,5 @@ public class AppConst {
 
     public static final Integer MAX_FILE_RETURN_IN_LOAD_A_CHAPTER = 100;
 
-    public static final String REGEX_CHECK_PASSWORD = ".{8,}";
-    public static final String REGEX_CHECK_USERNAME = "^[A-Za-z0-9]+$";
-    public static final String REGEX_CHECK_EMAIL = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
+
 }
