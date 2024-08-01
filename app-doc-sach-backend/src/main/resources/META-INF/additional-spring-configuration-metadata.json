@@ -1,18 +1,18 @@
 {"properties": [
   {
-    "name": "application.jwt.secret",
+    "name": "application.auth.jwt.secret",
     "type": "java.lang.String",
-    "description": "'application.jwt.secret'"
+    "description": "Khóa bí mật của jwt"
   },
   {
-    "name": "application.jwt.issuer",
+    "name": "application.auth.jwt.issuer",
     "type": "java.lang.String",
-    "description": "Issuer for jwt signature"
+    "description": "Trường 'iss' của jwt"
   },
   {
-    "name": "application.jwt.expiration",
+    "name": "application.auth.jwt.expirationMin",
     "type": "java.lang.String",
-    "description": "Expiration counted by day"
+    "description": "Thời gian hết hạn token, tính bằng phút"
   },
   {
     "name": "cloudinary.name",
@@ -28,5 +28,30 @@
     "name": "cloudinary.secret",
     "type": "java.lang.String",
     "description": "Cloudinary 'cloud secret key'"
+  },
+  {
+    "name": "application.defaultAvatar",
+    "type": "java.lang.String",
+    "description": "Url ảnh đại diện mặc định"
+  },
+  {
+    "name": "application.auth.refresh.expirationDay",
+    "type": "java.lang.String",
+    "description": "Thời gian hết hạn refreshToken, tính bằng ngày"
+  },
+  {
+    "name": "application.auth.disable-duration",
+    "type": "java.time.Duration",
+    "description": "Thời gian khóa tài khoản"
+  },
+  {
+    "name": "application.cron.clear-refresh-token-db",
+    "type": "java.lang.String",
+    "description": "Cron cho việc dọn dẹp bảng refresh_token"
+  },
+  {
+    "name": "application.auth.refresh.duration-to-delete",
+    "type": "java.time.Duration",
+    "description": "Khoảng thời gian không truy cập để dọn dẹp refresh token"
   }
 ]}

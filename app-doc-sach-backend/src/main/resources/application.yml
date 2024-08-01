@@ -1,4 +1,10 @@
 spring:
+  profiles:
+    active:
+    - dev
+    - stage
+    - prod
+    default: default
   application:
     name: app-doc-sach
   datasource:
@@ -20,7 +26,14 @@ spring:
   output:
     ansi:
       enabled: always
-
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      client-type: lettuce
+      connect-timeout: 1000ms
+      
   security:
     oauth2:
       client:
@@ -48,10 +61,18 @@ logging:
 
 # cấu hình JWT
 application:
-  jwt:
-    secret: randomStringToMakeSecretKeyFdsksdnkzvk2oejaofcjewfr4ieoru39wjfmsfddshgvndkjfnakhdhiaukrfhqiauyh98atfh8373y4hdi3ewfhbg87ezfyhq38yhiafha83oq
-    issuer: http://localhost:8080
-    expiration: 7
+  defaultAvatar: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.dreamstime.com%2Fdefault-avatar-profile-icon-default-avatar-profile-icon-grey-photo-placeholder-illustrations-vectors-image105356006&psig=AOvVaw3u6LJZpu4Ou6VrRr9uVRQj&ust=1721481293919000&source=images&cd=vfe&opi=89978449&ved=0CBEQjRxqFwoTCLiHltqXs4cDFQAAAAAdAAAAABAJ
+  cron:
+    clear-refresh-token-db: '* * */5 * * ?' # 5 ngày / lần
+  auth:
+    disable-duration: 30d
+    jwt:
+      secret: randomStringToMakeSecretKeyFdsksdnkzvk2oejaofcjewfr4ieoru39wjfmsfddshgvndkjfnakhdhiaukrfhqiauyh98atfh8373y4hdi3ewfhbg87ezfyhq38yhiafha83oq
+      issuer: http://localhost:8080
+      expirationMin: 40
+    refresh:
+      expirationDay: 7
+      duration-to-delete: 15d
 
 cloudinary:
   name: dqzwh7zvo
@@ -59,12 +80,11 @@ cloudinary:
   secret: Lk1CRVD-DmLiCDdyNVQUNwqsmgA
 
 springdoc:
-  show-oauth2-endpoints: true
-  pre-loading-enabled: true
-  swagger-ui:
-    path: /
-    try-it-out-enabled: false
-    operations-sorter: alpha
-    syntax-highlight:
-      activated: true
-      theme: nord
+  api-docs:
+    enabled: false
+  # show-oauth2-endpoints: true
+  # pre-loading-enabled: false
+  # swagger-ui:
+  #   path: /
+  #   try-it-out-enabled: false
+  #   operations-sorter: alpha

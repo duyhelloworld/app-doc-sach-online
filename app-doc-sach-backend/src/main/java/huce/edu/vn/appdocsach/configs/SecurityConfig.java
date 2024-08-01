@@ -14,26 +14,27 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import huce.edu.vn.appdocsach.filter.AuthFilter;
-import lombok.AccessLevel;
+import huce.edu.vn.appdocsach.services.impl.auth.AppUserService;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SecurityConfig {
 
-    AuthFilter authFilter;
+    private final AuthFilter authFilter;
 
-    OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
+    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
+
+    private final AppUserService appUserService;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(c -> c.disable())
                 .cors(c -> c.disable())
+                .userDetailsService(appUserService)
                 .sessionManagement(ss -> ss.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(r -> r.anyRequest().permitAll())
                 .oauth2Login(oauth -> oauth

@@ -1,25 +1,25 @@
 package huce.edu.vn.appdocsach.configs;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-
-@Configuration
+// @Configuration
 public class OpenApiConfig {
-    private SecurityScheme createAPIKeyScheme() {
-        return new SecurityScheme().type(SecurityScheme.Type.HTTP)
-                .bearerFormat("JWT")
-                .scheme("bearer");
-    }
 
-    @Bean
-    public OpenAPI openAPI() {
-        return new OpenAPI()
-                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
-                .components(new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()));
-    }
+    // private SecurityScheme createJWTWithRefreshTokenSecurityScheme() {
+    //     return new SecurityScheme()
+    //             .type(SecurityScheme.Type.HTTP)
+    //             .bearerFormat("JWT")
+    //             .name("Authorization")
+    //             .scheme("bearer");
+    // }
+
+    // @Bean
+    // public OpenAPI openAPI() {
+    //     return new OpenAPI()
+    //             .components(new Components()
+    //                 .addSecuritySchemes("Bearer Authentication", createJWTWithRefreshTokenSecurityScheme())
+    //             .addParameters("Refresh Token", new Parameter()
+    //                 .name(AuthContants.REFRESH_TOKEN_HEADER_NAME)
+    //                 .in(ParameterIn.HEADER.toString())
+    //                 .description("Refresh Token")
+    //                 .schema(new StringSchema())));
+    // }
 }
