@@ -8,14 +8,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import huce.edu.vn.appdocsach.annotations.auth.IsAdmin;
-import huce.edu.vn.appdocsach.dto.core.category.CategoryDto;
+import huce.edu.vn.appdocsach.dto.core.category.CategoryDetailDto;
 import huce.edu.vn.appdocsach.dto.core.category.CreateCategoryDto;
-import huce.edu.vn.appdocsach.dto.core.category.SimpleCategoryDto;
+import huce.edu.vn.appdocsach.dto.core.category.CategoryDto;
 import huce.edu.vn.appdocsach.services.abstracts.core.ICategoryService;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,20 +22,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("api/category")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CategoryController {
 
-    ICategoryService categoryService;
+    private final ICategoryService categoryService;
 
-    @Operation(summary = "Tìm tất cả thể loại, lấy cho trang home")
+    @Operation(summary = "Tìm tất cả thể loại cho trang home")
     @GetMapping("all")
-    public List<SimpleCategoryDto> getAllCategory() {
-        return categoryService.getAllSimpleCategory();
+    public List<CategoryDto> getAllCategory() {
+        return categoryService.getAllCategory();
     }
 
     @Operation(summary = "Tìm thể loại theo id")
     @GetMapping("find/{id}")
-    public CategoryDto getCategoryById(@PathVariable Integer id) {
+    public CategoryDetailDto getCategoryById(@PathVariable Integer id) {
         return categoryService.getCategoryById(id);
     }
 

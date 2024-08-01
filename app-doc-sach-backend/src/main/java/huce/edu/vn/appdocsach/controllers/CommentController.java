@@ -12,13 +12,11 @@ import huce.edu.vn.appdocsach.dto.core.comment.CommentDto;
 import huce.edu.vn.appdocsach.dto.core.comment.CreateCommentDto;
 import huce.edu.vn.appdocsach.dto.core.comment.FindCommentDto;
 import huce.edu.vn.appdocsach.dto.core.comment.UpdateCommentDto;
-import huce.edu.vn.appdocsach.paging.PagingResponse;
+import huce.edu.vn.appdocsach.dto.paging.PaginationResponseDto;
 import huce.edu.vn.appdocsach.services.abstracts.core.ICommentService;
-import huce.edu.vn.appdocsach.services.impl.auth.users.AuthUser;
+import huce.edu.vn.appdocsach.services.impl.auth.users.AuthenticatedUser;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,15 +25,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController
 @RequestMapping("api/comment")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CommentController {
 
-    ICommentService commentService;
-    
-    @Operation(summary = "Lấy comment cho 1 chapter")
+    private final ICommentService commentService;
+
+    @Operation(summary = "Lấy các bình luận cho 1 chapter")
     @GetMapping("all")
-    public PagingResponse<CommentDto> getAllByChapter(FindCommentDto findCommentDto) {
-        return commentService.getCommentsByChapter(findCommentDto);
+    public PaginationResponseDto<CommentDto> getAllByChapter(FindCommentDto findCommentDto) {
+        return commentService.getComments(findCommentDto);
     }
 
     @Operation(summary = "Lấy comment theo id")
@@ -48,16 +45,17 @@ public class CommentController {
     @IsUser
     @PostMapping("add")
     public CommentDto writeNewComment(
-        @AuthenticationPrincipal AuthUser authUser,   
+        @AuthenticationPrincipal AuthenticatedUser authUser,   
         @RequestBody CreateCommentDto createCommentDto) {
-        return commentService.writeComment(authUser.getUser(), createCommentDto);
+        return commentService.writeComment(authUser.getUser(),
+            createCommentDto);
     }
 
     @Operation(summary = "Sửa 1 comment")
     @IsUser
     @PutMapping("edit")
     public CommentDto updateComment(
-    @AuthenticationPrincipal AuthUser authUser,    
+    @AuthenticationPrincipal AuthenticatedUser authUser,    
     @RequestBody UpdateCommentDto updateCommentDto) {
         return commentService.updateComment(authUser.getUser(), updateCommentDto);
     }
@@ -66,8 +64,10 @@ public class CommentController {
     @IsUser
     @DeleteMapping("{id}")
     public void deleteComment(
-            @AuthenticationPrincipal AuthUser authUser,
+            @AuthenticationPrincipal AuthenticatedUser authUser,
             @PathVariable Integer id) {
         commentService.removeComment(id, authUser.getUser());
     }
+
+    
 }

@@ -12,50 +12,45 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import huce.edu.vn.appdocsach.annotations.auth.IsAdmin;
+import huce.edu.vn.appdocsach.configs.AppObjectMapper;
 import huce.edu.vn.appdocsach.dto.core.chapter.CreateChapterDto;
 import huce.edu.vn.appdocsach.dto.core.chapter.FindChapterDto;
-import huce.edu.vn.appdocsach.dto.core.chapter.SimpleChapterDto;
-import huce.edu.vn.appdocsach.paging.PagingResponse;
+import huce.edu.vn.appdocsach.dto.core.chapter.ChapterDto;
+import huce.edu.vn.appdocsach.dto.paging.PaginationResponseDto;
 import huce.edu.vn.appdocsach.services.abstracts.core.IChapterService;
-import huce.edu.vn.appdocsach.utils.Mapper;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("api/chapter")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChapterController {
 
-    IChapterService chapterService;
+    private final IChapterService chapterService;
 
-    Mapper mapper;
+    private final AppObjectMapper mapper;
 
     @Operation(summary = "Lấy thông tin các chapter")
     @GetMapping
-    public PagingResponse<SimpleChapterDto> getChapterSimple(FindChapterDto findChapterDto) {
-        return chapterService.getAllChapterSimple(findChapterDto);
+    public PaginationResponseDto<ChapterDto> getChapterSimple(FindChapterDto findChapterDto) {
+        return chapterService.getAllChapter(findChapterDto);
     }
     
     @Operation(summary = "Đọc chapter")
     @GetMapping("find/{id}")
     public List<String> getChapter(@PathVariable Integer id) {
-        return chapterService.getChapter(id);
+        return chapterService.read(id);
     }
 
     @Operation(summary = "Upload 1 chapter cho 1 sách")
     @IsAdmin
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Integer addNewChapter(
-            @Parameter(description = "Upload từng ảnh 1 theo thứ tự")
             @RequestPart List<MultipartFile> files,
-            @Parameter(description = "{ \"title\": \"A\" , \"bookId\": 1 }")
-            @RequestPart String jsonDto) {
-        return chapterService.create(files, mapper.getInstance(jsonDto, CreateChapterDto.class));
+            @RequestPart String json) {
+        return chapterService.createNew(files, mapper.toPojo(json, CreateChapterDto.class));
     }
+
 }
