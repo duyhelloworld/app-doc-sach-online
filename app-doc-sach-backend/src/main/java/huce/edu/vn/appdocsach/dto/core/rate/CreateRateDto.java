@@ -4,7 +4,9 @@ import org.hibernate.validator.constraints.Range;
 
 import huce.edu.vn.appdocsach.entities.Star;
 import jakarta.validation.Valid;
+import lombok.ToString;
 
+@ToString
 @Valid
 public class CreateRateDto {
     

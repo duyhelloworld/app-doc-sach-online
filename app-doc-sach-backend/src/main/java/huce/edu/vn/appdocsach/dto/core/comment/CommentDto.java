@@ -2,8 +2,7 @@ package huce.edu.vn.appdocsach.dto.core.comment;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
+import huce.edu.vn.appdocsach.annotations.time.ValidDatetimeFormat;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,12 +14,11 @@ public class CommentDto {
 
     private String content;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @ValidDatetimeFormat
     private LocalDateTime commentAt;
 
-    private boolean isEdited;
+    @ValidDatetimeFormat
+    private LocalDateTime editedAt;
 
     private String username;
-
-    private String userAvatar;
 }

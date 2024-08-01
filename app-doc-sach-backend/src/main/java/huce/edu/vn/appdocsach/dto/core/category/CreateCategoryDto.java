@@ -1,17 +1,17 @@
 package huce.edu.vn.appdocsach.dto.core.category;
 
-import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Setter
-@Getter
+@Data
+@NoArgsConstructor
+@Valid
 public class CreateCategoryDto {
 
-    @NotBlank
+    @NotBlank(message = "CATEGORY_NAME_NOT_FOUND")
     private String name;
 
-    @Nullable
     private String description;
 }

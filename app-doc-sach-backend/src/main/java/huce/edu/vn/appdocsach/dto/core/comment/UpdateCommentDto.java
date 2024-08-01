@@ -1,15 +1,14 @@
 package huce.edu.vn.appdocsach.dto.core.comment;
 
-import org.hibernate.validator.constraints.Range;
-
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
+@Valid
 public class UpdateCommentDto {
-    @Range(min = 1)
+    @Min(1)
     private Integer id;
 
     @NotBlank(message = "COMMENT_CONTENT_MISSING")

@@ -5,8 +5,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class SimpleCategoryDto {
+public class CategoryDetailDto {
     private Integer id;
 
     private String name;
+
+    private String description;
 }
