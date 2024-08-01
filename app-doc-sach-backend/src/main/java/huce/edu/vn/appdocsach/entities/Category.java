@@ -1,11 +1,9 @@
 package huce.edu.vn.appdocsach.entities;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import huce.edu.vn.appdocsach.entities.base.AuditedEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,13 +12,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Setter
 @Getter
-@ToString
 @Entity
-public class Category {
+public class Category extends AuditedEntity {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -31,7 +28,6 @@ public class Category {
     @Column(columnDefinition = "text")
     private String description;
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "categories")
     private List<Book> books = new ArrayList<>();
 }
