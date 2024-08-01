@@ -10,34 +10,33 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.api.ApiResponse;
 import com.cloudinary.utils.ObjectUtils;
 
-import huce.edu.vn.appdocsach.constants.AppConst;
+import huce.edu.vn.appdocsach.constants.PagingConstants;
 import huce.edu.vn.appdocsach.enums.ResponseCode;
 import huce.edu.vn.appdocsach.exception.AppException;
 import huce.edu.vn.appdocsach.services.abstracts.file.ICloudinaryService;
-import huce.edu.vn.appdocsach.utils.AppLogger;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 public class CloudinaryService implements ICloudinaryService {
 
     Cloudinary cloudinary; 
+    
+    private Map<String, Object> map = new HashMap<>();
 
     public CloudinaryService(Cloudinary cloudinary) {
         this.cloudinary = cloudinary;
     }
     
-    private AppLogger<CloudinaryService> logger = new AppLogger<>(CloudinaryService.class);
-
-    private Map<String, Object> map = new HashMap<>();
-
     @Override
     public boolean isValidFileName(MultipartFile image) {
         String fileName = image.getOriginalFilename();
         return !StringUtils.containsWhitespace(fileName)
-            && AppConst.VALID_IMAGE_EXTENSIONS.contains(StringUtils.getFilenameExtension(fileName));
+            && PagingConstants.VALID_IMAGE_EXTENSIONS.contains(StringUtils.getFilenameExtension(fileName));
     }
 
     @Override
@@ -56,12 +55,12 @@ public class CloudinaryService implements ICloudinaryService {
             response = cloudinary.uploader().upload(file, map);
             // logger.info(response);
             if (response.containsKey("error")) {
-                logger.error("save", response.get("error").toString());
+                log.error("Error when save " + fileName + " : ", response.get("error").toString());
             } else {
                 return response.get("url").toString();
             }
         } catch (IOException e) {
-            logger.error(e);
+            log.error("Error when read file", e);
         }
         return null;
     }
@@ -72,10 +71,10 @@ public class CloudinaryService implements ICloudinaryService {
         try {
             ApiResponse response = cloudinary.api().createFolder(folderName, ObjectUtils.emptyMap());
             if (response.containsKey("error")) {
-                logger.error("createFolder", response.get("error").toString());
+                log.error("createFolder", response.get("error").toString());
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
         }
     }
 
@@ -95,32 +94,31 @@ public class CloudinaryService implements ICloudinaryService {
             map.put("public_id", fileName);
             try {
                 if (!isValidFileName(file)) {
-                    logger.error("File {} at index {} has wrong type", fileName, i);
+                    log.error("File {} at index {} has wrong type", fileName, i);
                     continue;
                 }
                 cloudinary.uploader().upload(file.getBytes(), map);
-                logger.info("Uploaded image at index " + i + " with name : {}", fileName);
+                log.info("Uploaded image at index " + i + " with name : {}", fileName);
             } catch (IOException e) {
-                logger.error("Failed upload image at index " + i + " with name : {}", fileName);
-                logger.error(e);
+                log.error("Failed upload image at index " + i + ", file name : " + fileName, e);
             }
         }
     }
 
     @Override
     public List<String> getUrls(String folderName) {
-        logger.onStart(Thread.currentThread(), folderName);
+        log.info("Start getUrls with input : ", folderName);
         List<String> fileUrls = new LinkedList<>();
         ApiResponse response;
         map.clear();
         map.put("return_error", true);
         map.put("type", "upload");
         map.put("prefix", folderName);
-        map.put("max_results", AppConst.MAX_FILE_RETURN_IN_LOAD_A_CHAPTER);
+        map.put("max_results", PagingConstants.MAX_FILE_RETURN_IN_LOAD_A_CHAPTER);
         try {
             response = cloudinary.api().resources(map);
             if (response.containsKey("error")) {
-                logger.error("Error to get files in folder ".concat(folderName), response.get("error"));
+                log.error("Error to get files in folder ".concat(folderName), response.get("error"));
                 return fileUrls;
             }
             Object rawResources = response.get("resources");
@@ -130,7 +128,7 @@ public class CloudinaryService implements ICloudinaryService {
                 }
             }
         } catch (Exception e) {
-            logger.error(e);
+            log.error("Error when load file content", e);
         }
         return fileUrls;
     }
@@ -140,7 +138,7 @@ public class CloudinaryService implements ICloudinaryService {
         try {
             return save(file.getBytes(), file.getOriginalFilename());
         } catch (IOException e) {
-            logger.error(e);
+            log.error("Error when read file ", e);
             throw new AppException(ResponseCode.FILE_CONTENT_INVALID);
         }
     }
@@ -153,14 +151,24 @@ public class CloudinaryService implements ICloudinaryService {
         try {
             ApiResponse apiResponse = cloudinary.api().deleteResourcesByPrefix(folderName, map);
             if (apiResponse.containsKey("error")) {
-                logger.error("Error while deleting folder {}".concat(folderName), apiResponse.get("error"));
+                log.error("Error while deleting folder {}".concat(folderName), apiResponse.get("error"));
             } else {
-                logger.info("Success deleted " + folderName);
+                log.info("Success deleted " + folderName);
             }
         } catch (Exception e) {
-            logger.error(e);
+            log.error("Error when delete ", e);
         }
-        
+    }
+
+    @Override
+    public void deleteOne(String url) {
+        String fileName = extractFilenameFromUrl(url);
+        try {
+            map.clear();
+            cloudinary.uploader().destroy(fileName, map);
+        } catch (IOException e) {
+            log.error("Error when read file ", e);
+        }
     }
 
     private String removeExtension(String fileName) {
@@ -183,17 +191,6 @@ public class CloudinaryService implements ICloudinaryService {
             }
         }
         return null;
-    }
-
-    @Override
-    public void deleteOne(String url) {
-        String fileName = extractFilenameFromUrl(url);
-        try {
-            map.clear();
-            cloudinary.uploader().destroy(fileName, map);
-        } catch (IOException e) {
-            logger.error(e);
-        }
     }
 
     private String extractFilenameFromUrl(String url) {

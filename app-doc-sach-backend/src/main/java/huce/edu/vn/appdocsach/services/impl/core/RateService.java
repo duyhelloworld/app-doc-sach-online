@@ -10,14 +10,17 @@ import huce.edu.vn.appdocsach.entities.Rating;
 import huce.edu.vn.appdocsach.entities.User;
 import huce.edu.vn.appdocsach.enums.ResponseCode;
 import huce.edu.vn.appdocsach.exception.AppException;
-import huce.edu.vn.appdocsach.repositories.BookRepo;
-import huce.edu.vn.appdocsach.repositories.RatingRepo;
+import huce.edu.vn.appdocsach.repositories.database.BookRepo;
+import huce.edu.vn.appdocsach.repositories.database.RatingRepo;
 import huce.edu.vn.appdocsach.services.abstracts.core.IRateService;
-import huce.edu.vn.appdocsach.utils.AppLogger;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
+@AllArgsConstructor
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RateService implements IRateService {
@@ -26,29 +29,18 @@ public class RateService implements IRateService {
 
     BookRepo bookRepo;
 
-    AppLogger<RateService> logger;
-
-    public RateService(RatingRepo ratingRepo, BookRepo bookRepo) {
-        this.ratingRepo = ratingRepo;
-        this.bookRepo = bookRepo;
-        this.logger = new AppLogger<>(RateService.class);
-    }
-    
     @Override
     @Transactional
-    public void toggerRate(User user, CreateRateDto createRateDto, Integer bookId) {
-        logger.onStart(Thread.currentThread(), user.getUsername(), createRateDto);
+    public void rate(User user, CreateRateDto createRateDto, Integer bookId) {
+        log.info("Start toggerRate by {} with input : ", user.getUsername(), createRateDto);
         Book book = bookRepo.findById(bookId).orElseThrow(
                 () -> new AppException(ResponseCode.BOOK_NOT_FOUND));
-        Optional<Rating> ratingOptional = ratingRepo.findByUserAndBook(user, book);
+        Optional<Rating> ratingOptional = ratingRepo.findByCreateByAndBook(user.getUsername(), book);
         if (ratingOptional.isEmpty()) {
             Rating rating = new Rating();
             rating.setBook(book);
-            rating.setUser(user);
             rating.setStar(createRateDto.star);
             ratingRepo.save(rating);
-        } else {
-            ratingRepo.delete(ratingOptional.get());
         }
     }
 }

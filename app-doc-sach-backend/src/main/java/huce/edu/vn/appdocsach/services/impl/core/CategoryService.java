@@ -4,38 +4,35 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import huce.edu.vn.appdocsach.dto.core.category.CategoryDto;
+import huce.edu.vn.appdocsach.dto.core.category.CategoryDetailDto;
 import huce.edu.vn.appdocsach.dto.core.category.CreateCategoryDto;
-import huce.edu.vn.appdocsach.dto.core.category.SimpleCategoryDto;
+import huce.edu.vn.appdocsach.dto.core.category.CategoryDto;
 import huce.edu.vn.appdocsach.entities.Category;
 import huce.edu.vn.appdocsach.enums.ResponseCode;
 import huce.edu.vn.appdocsach.exception.AppException;
-import huce.edu.vn.appdocsach.repositories.CategoryRepo;
+import huce.edu.vn.appdocsach.mapper.ModelMapper;
+import huce.edu.vn.appdocsach.repositories.database.CategoryRepo;
 import huce.edu.vn.appdocsach.services.abstracts.core.ICategoryService;
-import huce.edu.vn.appdocsach.utils.AppLogger;
-import huce.edu.vn.appdocsach.utils.ConvertUtils;
+import huce.edu.vn.appdocsach.utils.JsonUtils;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class CategoryService implements ICategoryService {
 
     CategoryRepo categoryRepo;
 
-    AppLogger<CategoryService> logger;
-
-    public CategoryService(CategoryRepo categoryRepo) {
-        this.categoryRepo = categoryRepo;
-        this.logger = new AppLogger<>(CategoryService.class);
-    }
-
     @Override
     @Transactional
-    public List<SimpleCategoryDto> getAllSimpleCategory() {
-        logger.onStart(Thread.currentThread());
-        return categoryRepo.findAll().stream().map(c -> ConvertUtils.convertSimple(c)).toList();
+    public List<CategoryDto> getAllCategory() {
+        log.info("Start getAllCategory with input : ");
+        return categoryRepo.findAll().stream().map(c -> ModelMapper.convertSimple(c)).toList();
     }
 
     @Override
@@ -45,16 +42,16 @@ public class CategoryService implements ICategoryService {
 
     @Override
     @Transactional
-    public CategoryDto getCategoryById(Integer id) {
-        logger.onStart(Thread.currentThread(), id);
-        return ConvertUtils.convert(categoryRepo.findById(id)
+    public CategoryDetailDto getCategoryById(Integer id) {
+        log.info("Start getCategoryById with input : ", id);
+        return ModelMapper.convert(categoryRepo.findById(id)
                 .orElseThrow(() -> new AppException(ResponseCode.CATEGORY_NOT_FOUND)));
     }
 
     @Override
     @Transactional
     public Integer createNew(CreateCategoryDto createCategoryDto) {
-        logger.onStart(Thread.currentThread());
+        log.info("Start createNew with input : ", JsonUtils.json(createCategoryDto));
         if (categoryRepo.existsByName(createCategoryDto.getName())) {
             throw new AppException(ResponseCode.CATEGORY_NAME_EXISTED);
         }

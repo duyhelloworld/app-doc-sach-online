@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import huce.edu.vn.appdocsach.services.abstracts.file.IResourceService;
 
 @Service
-public class ResourceService implements IResourceService{
+public class ResourceService implements IResourceService {
 
     @Override
     public byte[] readStatic(String fileName) {

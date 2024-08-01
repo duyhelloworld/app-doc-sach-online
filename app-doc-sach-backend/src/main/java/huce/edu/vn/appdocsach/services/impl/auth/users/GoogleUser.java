@@ -4,10 +4,10 @@ import java.util.Map;
 
 import huce.edu.vn.appdocsach.entities.TokenProvider;
 
-public class GoogleUser extends AuthUser {
+public class GoogleUser extends SupportedOAuth2User {
+    
     public GoogleUser(Map<String, Object> attributes) {
-        super(attributes);
-        this.setProvider(TokenProvider.GOOGLE);
+        super(attributes, TokenProvider.GOOGLE);
     }
 
     @Override
@@ -17,7 +17,7 @@ public class GoogleUser extends AuthUser {
 
     @Override
     public String getUsername() {
-        return getAttribute("email");
+        return getAttribute("sub");
     }
 
     @Override

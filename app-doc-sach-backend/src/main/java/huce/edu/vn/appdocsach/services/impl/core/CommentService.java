@@ -1,7 +1,5 @@
 package huce.edu.vn.appdocsach.services.impl.core;
 
-import java.time.LocalDateTime;
-
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -9,22 +7,26 @@ import huce.edu.vn.appdocsach.dto.core.comment.CommentDto;
 import huce.edu.vn.appdocsach.dto.core.comment.CreateCommentDto;
 import huce.edu.vn.appdocsach.dto.core.comment.FindCommentDto;
 import huce.edu.vn.appdocsach.dto.core.comment.UpdateCommentDto;
+import huce.edu.vn.appdocsach.dto.paging.PagingHelper;
+import huce.edu.vn.appdocsach.dto.paging.PaginationResponseDto;
 import huce.edu.vn.appdocsach.entities.Chapter;
 import huce.edu.vn.appdocsach.entities.Comment;
 import huce.edu.vn.appdocsach.entities.User;
 import huce.edu.vn.appdocsach.enums.ResponseCode;
 import huce.edu.vn.appdocsach.exception.AppException;
-import huce.edu.vn.appdocsach.paging.PagingResponse;
-import huce.edu.vn.appdocsach.repositories.ChapterRepo;
-import huce.edu.vn.appdocsach.repositories.CommentRepo;
+import huce.edu.vn.appdocsach.mapper.ModelMapper;
+import huce.edu.vn.appdocsach.repositories.database.ChapterRepo;
+import huce.edu.vn.appdocsach.repositories.database.CommentRepo;
 import huce.edu.vn.appdocsach.services.abstracts.core.ICommentService;
-import huce.edu.vn.appdocsach.utils.AppLogger;
-import huce.edu.vn.appdocsach.utils.ConvertUtils;
-import huce.edu.vn.appdocsach.paging.PagingHelper;
+import huce.edu.vn.appdocsach.utils.JsonUtils;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
+@AllArgsConstructor
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CommentService implements ICommentService {
@@ -33,24 +35,16 @@ public class CommentService implements ICommentService {
 
     ChapterRepo chapterRepo;
 
-    AppLogger<CommentService> logger;
-
-    public CommentService(CommentRepo commentRepo, ChapterRepo chapterRepo) {
-        this.commentRepo = commentRepo;
-        this.chapterRepo = chapterRepo;
-        this.logger = new AppLogger<>(CommentService.class);
-    }
-
     @Override
-    @Transactional
-    public PagingResponse<CommentDto> getCommentsByChapter(FindCommentDto findCommentDto) {
-        logger.onStart(Thread.currentThread(), findCommentDto);
+    public PaginationResponseDto<CommentDto> getComments(FindCommentDto findCommentDto) {
+        log.info("Start getComments with input : ", JsonUtils.json(findCommentDto));
         Page<Comment> comments = commentRepo.findByChapterId(findCommentDto.getChapterId(),
                 PagingHelper.pageRequest(Comment.class, findCommentDto));
-        PagingResponse<CommentDto> response = new PagingResponse<>();
-        response.setTotalPage(comments.getTotalPages());
-        response.setValues(comments.map(c -> ConvertUtils.convert(c)).getContent());
-        return response;
+        return
+            PaginationResponseDto.<CommentDto>builder()
+            .values(comments.map(c -> ModelMapper.convert(c)).toList())
+            .totalPage(comments.getTotalPages())
+            .build();
     }
 
     @Override
@@ -61,8 +55,8 @@ public class CommentService implements ICommentService {
     @Override
     @Transactional
     public CommentDto getCommentById(Integer id) {
-        logger.onStart(Thread.currentThread(), id);
-        return commentRepo.findById(id).map(c -> ConvertUtils.convert(c))
+        log.info("Start getCommentById with input : {}", id);
+        return commentRepo.findById(id).map(c -> ModelMapper.convert(c))
             .orElseThrow(
                 () -> new AppException(ResponseCode.COMMENT_NOT_FOUND));
     }
@@ -70,39 +64,36 @@ public class CommentService implements ICommentService {
     @Override
     @Transactional
     public CommentDto writeComment(User user, CreateCommentDto createCommentDto) {
-        logger.onStart(Thread.currentThread(), user.getUsername(), createCommentDto);
+        log.info("Start writeComment by {} with input : {}", user.getUsername(), JsonUtils.json(createCommentDto));
         int chapterId = createCommentDto.getChapterId();
         Chapter chapter = chapterRepo.findById(chapterId)
                 .orElseThrow(() -> new AppException(ResponseCode.CHAPTER_NOT_FOUND));
         Comment comment = new Comment();
-        comment.setUser(user);
         comment.setContent(createCommentDto.getContent());
-        comment.setCreatedAt(LocalDateTime.now());
         comment.setChapter(chapter);
         commentRepo.save(comment);
-        return ConvertUtils.convert(comment);
+        return ModelMapper.convert(comment);
     }
 
     @Override
     public CommentDto updateComment(User user, UpdateCommentDto updateCommentDto) {
-        logger.onStart(Thread.currentThread(), updateCommentDto, user.getUsername());
+        log.info("Start updateComment by {} with input : {}", user.getUsername(), JsonUtils.json(updateCommentDto));
         Comment comment = commentRepo.findById(updateCommentDto.getId())
                 .orElseThrow(() -> new AppException(ResponseCode.COMMENT_NOT_FOUND));
-        if (!comment.getUser().equals(user)) {
+        if (!comment.getCreateBy().equals(user.getUsername())) {
             throw new AppException(ResponseCode.DONT_HAVE_EDIT_COMMENT_PERMISSION);
         }
         comment.setContent(updateCommentDto.getContent());
-        comment.setEditedAt(LocalDateTime.now());
-        return ConvertUtils.convert(commentRepo.save(comment));
+        return ModelMapper.convert(commentRepo.save(comment));
     }
 
     @Override
     @Transactional
     public void removeComment(Integer id, User user) {
-        logger.onStart(Thread.currentThread(), id, user.getUsername());
+        log.info("Start removeComment by {} with input : {}", user.getUsername(), id);
         Comment comment = commentRepo.findById(id)
                 .orElseThrow(() -> new AppException(ResponseCode.COMMENT_NOT_FOUND));
-        if (!comment.getUser().equals(user)) {
+        if (!comment.getCreateBy().equals(user.getUsername())) {
             throw new AppException(ResponseCode.DONT_HAVE_REMOVE_COMMENT_PERMISSION);
         }  
         commentRepo.delete(comment);

@@ -9,29 +9,34 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import huce.edu.vn.appdocsach.dto.core.book.BookDto;
+import huce.edu.vn.appdocsach.dto.core.book.BookDetailDto;
 import huce.edu.vn.appdocsach.dto.core.book.CreateBookDto;
-import huce.edu.vn.appdocsach.dto.core.book.SimpleBookDto;
+import huce.edu.vn.appdocsach.dto.core.book.FindBookDto;
+import huce.edu.vn.appdocsach.dto.core.book.BookDto;
+import huce.edu.vn.appdocsach.dto.paging.PagingHelper;
+import huce.edu.vn.appdocsach.dto.paging.PaginationResponseDto;
 import huce.edu.vn.appdocsach.entities.Book;
 import huce.edu.vn.appdocsach.entities.Category;
 import huce.edu.vn.appdocsach.enums.ResponseCode;
 import huce.edu.vn.appdocsach.exception.AppException;
-import huce.edu.vn.appdocsach.paging.PagingHelper;
-import huce.edu.vn.appdocsach.paging.PagingRequest;
-import huce.edu.vn.appdocsach.paging.PagingResponse;
-import huce.edu.vn.appdocsach.repositories.BookRepo;
-import huce.edu.vn.appdocsach.repositories.CategoryRepo;
+import huce.edu.vn.appdocsach.mapper.ModelMapper;
+import huce.edu.vn.appdocsach.repositories.database.BookRepo;
+import huce.edu.vn.appdocsach.repositories.database.CategoryRepo;
 import huce.edu.vn.appdocsach.services.abstracts.core.IBookService;
 import huce.edu.vn.appdocsach.services.abstracts.file.ICloudinaryService;
-import huce.edu.vn.appdocsach.utils.AppLogger;
-import huce.edu.vn.appdocsach.utils.ConvertUtils;
+import huce.edu.vn.appdocsach.utils.JsonUtils;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class BookService implements IBookService {
 
     BookRepo bookRepo;
@@ -40,23 +45,13 @@ public class BookService implements IBookService {
 
     ICloudinaryService cloudinaryService;
 
-    AppLogger<BookService> logger ;
-
-    public BookService(BookRepo bookRepo, CategoryRepo categoryRepo, ICloudinaryService cloudinaryService) {
-        this.bookRepo = bookRepo;
-        this.categoryRepo = categoryRepo;
-        this.cloudinaryService = cloudinaryService;
-        this.logger = new AppLogger<>(BookService.class);
-    }
-
     @Override
     @Transactional
-    public PagingResponse<SimpleBookDto> getAllBook(PagingRequest pagingRequest, Integer categoryId, String sort,
-            String keyword) {
-        logger.onStart(Thread.currentThread(), pagingRequest, "categoryId", categoryId, "sort", sort, "keyword", keyword);
-    
+    public PaginationResponseDto<BookDto> getAllBook(FindBookDto findBookDto) {
+        log.info("Start getAllBook with input : ", JsonUtils.json(findBookDto));
+        
         Sort sortResult;
-        switch (sort) {
+        switch (findBookDto.getSortBy()) {
             case "id":
                 sortResult = Sort.by(Direction.ASC, "id");
                 break;
@@ -66,20 +61,20 @@ public class BookService implements IBookService {
             default:
                 throw new AppException(ResponseCode.INVALID_SORT_BY);
         }
-        Pageable pageRequest = PagingHelper.pageRequest(Book.class, pagingRequest, sortResult);
+        Pageable pageRequest = PagingHelper.pageRequest(Book.class, findBookDto, sortResult);
         
         Page<Book> books;
-        if (StringUtils.hasText(keyword)) {
-            books = bookRepo.search(keyword, pageRequest);
-        } else if (categoryId > 0) {
-            books = bookRepo.findByCategoryId(categoryId, pageRequest);
+        if (StringUtils.hasText(findBookDto.getKeyword())) {
+            books = bookRepo.search(findBookDto.getKeyword(), pageRequest);
+        } else if (findBookDto.getCategoryId() != null) {
+            books = bookRepo.findByCategoryId(findBookDto.getCategoryId(), pageRequest);
         } else {
             books = bookRepo.findAll(pageRequest);
         }
-        PagingResponse<SimpleBookDto> pagingResponse = new PagingResponse<>();
-        pagingResponse.setValues(books.map(b -> ConvertUtils.convertSimple(b)).getContent());
-        pagingResponse.setTotalPage(books.getTotalPages());
-        return pagingResponse;
+        return PaginationResponseDto.<BookDto>builder()
+            .values(books.map(b -> ModelMapper.convertSimple(b)).getContent())
+            .totalPage(books.getTotalPages())
+            .build();
     }
 
     @Override
@@ -89,28 +84,28 @@ public class BookService implements IBookService {
 
     @Override
     @Transactional
-    public BookDto getBookById(Integer id) {
-        logger.onStart(Thread.currentThread(), id);
-        return ConvertUtils.convert(bookRepo.findById(id)
+    public BookDetailDto getBookById(Integer id) {
+        log.info("Start getBookById with input : {}", id);
+        return ModelMapper.convert(bookRepo.findById(id)
                 .orElseThrow(() -> new AppException(ResponseCode.BOOK_NOT_FOUND)));
     }
 
     @Override
     @Transactional
-    public Integer addBook(CreateBookDto createBookDto, byte[] coverImage, String fileName) {
+    public Integer addBook(MultipartFile coverImage, CreateBookDto createBookDto) {
         String coverImageUrl;
-        logger.onStart(Thread.currentThread(), createBookDto, "Cover image : ", fileName);
-        coverImageUrl = cloudinaryService.save(coverImage, fileName);
+        log.info("Start getBookById with input : ", JsonUtils.json(createBookDto));
+        coverImageUrl = cloudinaryService.save(coverImage);
         if (bookRepo.existsByTitle(createBookDto.getTitle())) {
             throw new AppException(ResponseCode.BOOK_TITLE_EXISTED);
         }
-        List<Category> categories = categoryRepo.findByIds(createBookDto.getCategoryIds());
+        List<Category> categories = categoryRepo.findAllById(createBookDto.getCategoryIds());
         Book book = new Book();
         book.setAuthor(createBookDto.getAuthor());
         book.setTitle(createBookDto.getTitle());
         book.setDescription(createBookDto.getDescription());
         book.setCoverImage(coverImageUrl);
-        book.setCreatedAt(LocalDateTime.now());
+        book.setCreateAt(LocalDateTime.now());
         book.setCategories(categories);
         bookRepo.save(book);
         return book.getId();

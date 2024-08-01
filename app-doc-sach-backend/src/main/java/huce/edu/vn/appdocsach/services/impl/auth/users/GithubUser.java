@@ -1,14 +1,13 @@
 package huce.edu.vn.appdocsach.services.impl.auth.users;
 
 import java.util.Map;
-import java.util.Optional;
 
 import huce.edu.vn.appdocsach.entities.TokenProvider;
 
-public class GithubUser extends AuthUser {
+public class GithubUser extends SupportedOAuth2User {
+
     public GithubUser(Map<String, Object> attributes) {
-        super(attributes);
-        this.setProvider(TokenProvider.GITHUB);
+        super(attributes, TokenProvider.GITHUB);
     }
 
     @Override
@@ -17,9 +16,9 @@ public class GithubUser extends AuthUser {
     }
 
     @Override
+    @SuppressWarnings("null")
     public String getUsername() {
-        return Optional.ofNullable(getEmail())
-            .orElse(getAttribute("login"));
+        return getAttribute("id").toString() + "_" + getAttribute("login");
     }
 
     @Override

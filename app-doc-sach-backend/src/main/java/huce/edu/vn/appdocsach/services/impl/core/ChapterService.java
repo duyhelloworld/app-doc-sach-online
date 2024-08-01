@@ -10,26 +10,30 @@ import org.springframework.web.multipart.MultipartFile;
 
 import huce.edu.vn.appdocsach.dto.core.chapter.CreateChapterDto;
 import huce.edu.vn.appdocsach.dto.core.chapter.FindChapterDto;
-import huce.edu.vn.appdocsach.dto.core.chapter.SimpleChapterDto;
+import huce.edu.vn.appdocsach.dto.core.chapter.ChapterDto;
+import huce.edu.vn.appdocsach.dto.paging.PagingHelper;
+import huce.edu.vn.appdocsach.dto.paging.PaginationResponseDto;
 import huce.edu.vn.appdocsach.entities.Book;
 import huce.edu.vn.appdocsach.entities.Chapter;
 import huce.edu.vn.appdocsach.enums.ResponseCode;
 import huce.edu.vn.appdocsach.exception.AppException;
-import huce.edu.vn.appdocsach.paging.PagingResponse;
-import huce.edu.vn.appdocsach.repositories.BookRepo;
-import huce.edu.vn.appdocsach.repositories.ChapterRepo;
+import huce.edu.vn.appdocsach.mapper.ModelMapper;
+import huce.edu.vn.appdocsach.repositories.database.BookRepo;
+import huce.edu.vn.appdocsach.repositories.database.ChapterRepo;
 import huce.edu.vn.appdocsach.services.abstracts.core.IChapterService;
 import huce.edu.vn.appdocsach.services.abstracts.file.ICloudinaryService;
-import huce.edu.vn.appdocsach.utils.AppLogger;
-import huce.edu.vn.appdocsach.utils.ConvertUtils;
+import huce.edu.vn.appdocsach.utils.JsonUtils;
 import huce.edu.vn.appdocsach.utils.NamingUtil;
-import huce.edu.vn.appdocsach.paging.PagingHelper;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class ChapterService implements IChapterService {
 
     ChapterRepo chapterRepo;
@@ -38,22 +42,13 @@ public class ChapterService implements IChapterService {
 
     ICloudinaryService cloudinaryService;
 
-    AppLogger<ChapterService> logger ;
-
-    public ChapterService(ChapterRepo chapterRepo, BookRepo bookRepo, ICloudinaryService cloudinaryService) {
-        this.chapterRepo = chapterRepo;
-        this.bookRepo = bookRepo;
-        this.cloudinaryService = cloudinaryService;
-        this.logger = new AppLogger<>(ChapterService.class);
-    }
-
     @Override
     @Transactional
-    public List<String> getChapter(Integer id) {
-        logger.onStart(Thread.currentThread(), id);
+    public List<String> read(Integer id) {
+        log.info("Start read with input : ", id);
         Chapter chapter = chapterRepo.findById(id)
                 .orElseThrow(() -> new AppException(ResponseCode.CHAPTER_NOT_FOUND));
-        chapter.getBook().incViewCount();
+        chapter.getBook().incrementViewCount();
         return cloudinaryService.getUrls(chapter.getFolderName());
     }
 
@@ -64,23 +59,24 @@ public class ChapterService implements IChapterService {
 
     @Override
     @Transactional
-    public PagingResponse<SimpleChapterDto> getAllChapterSimple(FindChapterDto findChapterDto) {
-        logger.onStart(Thread.currentThread(), findChapterDto);
+    public PaginationResponseDto<ChapterDto> getAllChapter(FindChapterDto findChapterDto) {
+        log.info("Start getAllChapter with input : ", JsonUtils.json(findChapterDto));
         PageRequest pageRequest = PagingHelper.pageRequest(Chapter.class, findChapterDto);
         Book book = bookRepo.findById(findChapterDto.getBookId())
             .orElseThrow(() -> new AppException(ResponseCode.BOOK_NOT_FOUND));
-        book.incViewCount();
+        book.incrementViewCount();
         Page<Chapter> chapters = chapterRepo.findByBook(book, pageRequest);
         bookRepo.save(book);
-        PagingResponse<SimpleChapterDto> response = new PagingResponse<>();
-        response.setTotalPage(chapters.getTotalPages());
-        response.setValues(chapters.map(c -> ConvertUtils.convert(c)).getContent());
-        return response;
+        return PaginationResponseDto.<ChapterDto>builder()
+            .values(chapters.stream().map(c -> ModelMapper.convert(c)).toList())
+            .totalPage(chapters.getTotalPages())
+            .build();
     }
 
     @Override
     @Transactional
-    public Integer create(List<MultipartFile> files, CreateChapterDto createChapterDto) {
+    public Integer createNew(List<MultipartFile> files, CreateChapterDto createChapterDto) {
+        log.info("Start createNew with input : ", JsonUtils.json(createChapterDto), files.size() + " files");
         Book book = bookRepo.findById(createChapterDto.getBookId())
                 .orElseThrow(() -> new AppException(ResponseCode.BOOK_NOT_FOUND));
         if (chapterRepo.existsByTitle(createChapterDto.getTitle())) {
@@ -96,8 +92,8 @@ public class ChapterService implements IChapterService {
         Chapter chapter = new Chapter();
         chapter.setFolderName(folderName);
         chapter.setTitle(createChapterDto.getTitle());
-        chapter.setCreatedAt(now);
-        book.setUpdatedAt(now);
+        chapter.setCreateAt(now);
+        book.setUpdateAt(now);
         chapter.setBook(book);
         chapterRepo.save(chapter);
         return chapter.getId();
