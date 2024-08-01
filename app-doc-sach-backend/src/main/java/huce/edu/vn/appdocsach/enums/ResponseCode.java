@@ -3,7 +3,7 @@ package huce.edu.vn.appdocsach.enums;
 
 import org.springframework.http.HttpStatus;
 
-import huce.edu.vn.appdocsach.constants.AppConst;
+import huce.edu.vn.appdocsach.constants.PagingConstants;
 import huce.edu.vn.appdocsach.entities.Star;
 import lombok.Getter;
 
@@ -19,27 +19,33 @@ public enum ResponseCode {
     USERNAME_EXISTED(1004, "Tên tài khoản đã tồn tại", HttpStatus.CONFLICT),
     USERNAME_OR_PASSWORD_INCORRECT(1005, "Sai tài khoản hoặc mật khẩu", HttpStatus.UNAUTHORIZED),
     OLD_PASSWORD_NOT_MATCH(1006, "Mật khẩu không chính xác", HttpStatus.UNAUTHORIZED),
-
+    AUTH_SESSION_EXPIRED(1007, "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại", HttpStatus.UNAUTHORIZED),
+    AUTH_SESSION_INVALID(1008, "Phiên đăng nhập  không hợp lệ", HttpStatus.FORBIDDEN),
+    NEVER_SIGNIN(1008, "Bạn chưa đăng nhập lần nào", HttpStatus.FORBIDDEN),
     // @Valid User
-    USERNAME_MISSING(1007, "Không được bỏ trống tên tài khoản", HttpStatus.BAD_REQUEST),
-    USERNAME_INVALID(1008, "Tên tài khoản không hợp lệ. Tên tài khoản hợp lệ gồm các chữ cái (A-Z, a-z) và số (0-9)", HttpStatus.BAD_REQUEST),
-    PASSWORD_MISSING(1009, "Không được bỏ trống mật khẩu", HttpStatus.BAD_REQUEST),
-    EMAIL_MISSING(1010, "Không được bỏ trống email", HttpStatus.BAD_REQUEST),
-    EMAIL_INVALID(1011, "Email không hợp lệ. Hãy sử dụng địa chỉ email hợp lệ để đăng kí", HttpStatus.BAD_REQUEST),
-    PASSWORD_INVALID(1012, "Mật khẩu không hợp lệ. Hãy đặt mật khẩu dài hơn 8 kí tự", HttpStatus.BAD_REQUEST),
+    USERNAME_MISSING(1009, "Không được bỏ trống tên tài khoản", HttpStatus.BAD_REQUEST),
+    USERNAME_INVALID(10010, "Tên tài khoản không hợp lệ. Tên tài khoản hợp lệ gồm các chữ cái (A-Z, a-z) và số (0-9)", HttpStatus.BAD_REQUEST),
+    PASSWORD_MISSING(1011, "Không được bỏ trống mật khẩu", HttpStatus.BAD_REQUEST),
+    EMAIL_MISSING(1012, "Không được bỏ trống email", HttpStatus.BAD_REQUEST),
+    EMAIL_INVALID(1013, "Email không hợp lệ. Hãy sử dụng địa chỉ email hợp lệ để đăng kí", HttpStatus.BAD_REQUEST),
+    PASSWORD_INVALID(1014, "Mật khẩu không hợp lệ. Hãy đặt mật khẩu dài hơn 8 kí tự", HttpStatus.BAD_REQUEST),
     
     // File working
-    FILE_CONTENT_INVALID(1013, "Nội dung file không hợp lệ", HttpStatus.BAD_REQUEST),
-    FILE_TYPE_INVALID(1014, "Tên file/loại file này không được hỗ trợ. Các loại file hỗ trợ là "
-        .formatted(AppConst.VALID_IMAGE_EXTENSIONS), HttpStatus.EXPECTATION_FAILED),
-    FILE_CONTENT_MISSING(1015, "Thiếu file gửi lên", HttpStatus.NOT_FOUND),
+    FILE_CONTENT_INVALID(1015, "Nội dung file không hợp lệ", HttpStatus.BAD_REQUEST),
+    FILE_TYPE_INVALID(1016, "Tên file/loại file này không được hỗ trợ. Các loại file hỗ trợ là "
+        .formatted(PagingConstants.VALID_IMAGE_EXTENSIONS), HttpStatus.EXPECTATION_FAILED),
+    FILE_CONTENT_MISSING(1017, "Thiếu file gửi lên", HttpStatus.NOT_FOUND),
 
-    INVALID_KEY(1016, "Lỗi khi kiểm tra dữ liệu hợp lệ", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_SORT_BY(1017, "Lỗi khi xử lí sắp xếp dữ liệu", HttpStatus.BAD_REQUEST),
+    JSON_INVALID(1018, "Lỗi khi giải mã tham số gửi lên", HttpStatus.NOT_ACCEPTABLE),
+    
+    INVALID_KEY(1019, "Lỗi khi kiểm tra dữ liệu hợp lệ", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_SORT_BY(1020, "Lỗi khi xử lí sắp xếp dữ liệu", HttpStatus.BAD_REQUEST),
+    
     // Bussiness Logic Code
     CATEGORY_NOT_FOUND(2000, "Không thấy thể loại này", HttpStatus.NOT_FOUND),
     CATEGORY_NAME_EXISTED(2001, "Tên tiêu đề đã tồn tại", HttpStatus.CONFLICT),
-
+    CATEGORY_NAME_NOT_FOUND(2003, "Thiếu tiêu đề", HttpStatus.BAD_REQUEST),
+    
     COMMENT_NOT_FOUND(2002, "Không thấy bình luận này", HttpStatus.NOT_FOUND),
     COMMENT_CONTENT_MISSING(2003, "Nội dung bình luận không được để trống", HttpStatus.BAD_REQUEST),
     DONT_HAVE_EDIT_COMMENT_PERMISSION(2004, "Bạn không có quyền chỉnh sửa bình luận này", HttpStatus.FORBIDDEN),
