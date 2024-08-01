@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import huce.edu.vn.appdocsach.annotations.time.ValidDatetimeFormat;
 import lombok.Data;
 
 @Data
@@ -18,7 +18,7 @@ public class ErrorResponse {
 
     private List<String> messages;
 
-    @JsonFormat(pattern = "yyyy/MM/dd HH:mm:ss")
+    @ValidDatetimeFormat
     private LocalDateTime createAt = LocalDateTime.now();
 
     public void setMessages(String... messages) {
