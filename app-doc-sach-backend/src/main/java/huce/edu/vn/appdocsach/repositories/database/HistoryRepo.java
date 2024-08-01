@@ -1,4 +1,4 @@
-package huce.edu.vn.appdocsach.repositories;
+package huce.edu.vn.appdocsach.repositories.database;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
